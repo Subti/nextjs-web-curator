@@ -1,6 +1,6 @@
 ## Getting Started
 
-Clone repo to local machine. Use `npm run dev` to start development server, then head to `localhost:3000` to check out the page.
+Clone repo to local machine. `cd` into project folder and run `npm install`. Use `npm run dev` to start development server, then head to `localhost:3000` to check out the page.
 
 ## Final Product
 
