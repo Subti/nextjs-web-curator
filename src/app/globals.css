@@ -2,7 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
+.custom-border-input {
+  border: none;
+  border-bottom: 1px solid #333; /* Set bottom border */
+  outline: none; /* Remove default focus outline */
+}
+
+.custom-border-input:focus {
+  border-bottom-color: #108a5b; /* Change bottom border color on focus */
+  border-bottom-width: 2px;
+}
+
+/* :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
@@ -30,4 +41,4 @@ body {
   .text-balance {
     text-wrap: balance;
   }
-}
+} */
