@@ -8,7 +8,7 @@ const Button = () => {
   };
   return (
     <button
-      className="text-xl rounded-full px-7 py-3 bg-gradient-to-r from-[#2298dc] to-[#7a64a7]"
+      className="text-xl text-white rounded-full px-7 py-3 bg-gradient-to-r from-[#2298dc] to-[#7a64a7]"
       onClick={onClick}
     >
       Submit
