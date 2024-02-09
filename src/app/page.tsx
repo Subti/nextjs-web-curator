@@ -32,6 +32,7 @@ import Button from "./components/Button";
 import Column from "./components/Column";
 import Header from "./components/Header";
 import captureSettingsForms from "./modules/captureSettingsForms";
+import metadataForms from "./modules/metadataForms";
 
 export default function Home() {
   // const captureSettingsForms = [
@@ -44,14 +45,14 @@ export default function Home() {
   //   // Add more form data objects as needed
   // ];
 
-  const metadataForms = [
-    {
-      label: "Protocol",
-      id: "protocol",
-      name: "protocol",
-      value: "Wifi-BGN"
-    }
-  ];
+  // const metadataForms = [
+  //   {
+  //     label: "Protocol",
+  //     id: "protocol",
+  //     name: "protocol",
+  //     value: "Wifi-BGN"
+  //   }
+  // ];
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
