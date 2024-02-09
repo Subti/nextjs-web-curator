@@ -31,17 +31,18 @@ import React from "react";
 import Button from "./components/Button";
 import Column from "./components/Column";
 import Header from "./components/Header";
+import captureSettingsForms from "./modules/captureSettingsForms";
 
 export default function Home() {
-  const captureSettingsForms = [
-    {
-      label: "IP Address",
-      id: "ip_address",
-      name: "ip_address",
-      value: "192.168.40.2"
-    }
-    // Add more form data objects as needed
-  ];
+  // const captureSettingsForms = [
+  //   {
+  //     label: "IP Address",
+  //     id: "ip_address",
+  //     name: "ip_address",
+  //     value: "192.168.40.2"
+  //   }
+  //   // Add more form data objects as needed
+  // ];
 
   const metadataForms = [
     {
