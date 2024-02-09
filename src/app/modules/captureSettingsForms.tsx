@@ -22,7 +22,7 @@ const captureSettingsForms = [
     label: "Sample Rate",
     id: "sample_rate",
     name: "sample_rate",
-    value: "192.168.40.2"
+    value: "40000000"
   },
   {
     label: "Gain",
