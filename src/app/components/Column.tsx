@@ -1,16 +1,3 @@
-// import React from "react";
-
-// const Column = (props: any) => {
-//   return (
-//     <div className="flex flex-col flex-grow bg-black w-1/2 h-20">
-//       <h2 className="text-center">{props.title}</h2>
-//     </div>
-//   );
-// };
-
-// export default Column;
-
-// Column.tsx
 import React from "react";
 import Form from "./Form";
 
@@ -28,8 +15,8 @@ interface ColumnProps {
 
 const Column: React.FC<ColumnProps> = ({ title, forms }) => {
   return (
-    <div className="flex flex-col flex-grow bg-black w-1/2 px-3">
-      <h2 className="text-center">{title}</h2>
+    <div className="flex flex-col flex-grow border-1 rounded-md shadow-xl w-1/2 py-8 px-3 mb-3">
+      <h2 className="text-center text-3xl text-[#2298dc] mb-7">{title}</h2>
       {forms.map((formData, index) => (
         <Form key={index} {...formData} />
       ))}
