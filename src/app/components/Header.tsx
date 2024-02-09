@@ -2,7 +2,7 @@ import React from "react";
 
 const Header = () => {
   return (
-    <div className="text-4xl flex relative w-4/5 h-32 bg-[#2298dc] justify-center items-center mb-4">
+    <div className="text-4xl text-white flex relative w-4/5 h-32 bg-[#2298dc] justify-center items-center mb-4">
       Capture recording from software defined radio
     </div>
   );
