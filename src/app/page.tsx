@@ -13,15 +13,15 @@ import metadataForms from "./modules/metadataForms"; // Importing metadataForms 
  * and a button.
  */
 export default function Home() {
+  const allForms = [...captureSettingsForms, ...metadataForms];
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
       {/* Rendering Header component */}
       <Header />
       <div className="flex flex-grow bg-white w-1/2">
-        {/* Rendering Column component for Capture Settings */}
-        <Column title="Capture Settings" forms={captureSettingsForms} />
-        {/* Rendering Column component for Metadata */}
-        <Column title="Metadata" forms={metadataForms} />
+        {/* Rendering Column component with all forms */}
+        <Column title="Capture Settings & Metadata" forms={allForms} />
       </div>
       {/* Rendering Button component */}
       <Button />
