@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useRouter } from 'next/navigation';
 import Form from "./Form";
 
 interface FormData {
@@ -16,12 +17,12 @@ interface ColumnProps {
 }
 
 const Column: React.FC<ColumnProps> = ({ title, forms }) => {
-  // Create a state object to hold the values of all forms in the column
+  const router = useRouter();
+  const [imageUrl, setImageUrl] = useState(null);
   const [formValues, setFormValues] = useState<Record<string, string>>(
     forms.reduce((values, form) => ({ ...values, [form.id]: form.value }), {})
   );
 
-  // Function to handle form value changes
   const handleFormChange = (id: string, value: string) => {
     setFormValues(values => ({ ...values, [id]: value }));
   };
@@ -29,7 +30,6 @@ const Column: React.FC<ColumnProps> = ({ title, forms }) => {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    // Convert form values to their appropriate types
     const processedFormValues: { [key: string]: string | number } = {
       ...formValues,
     };
@@ -47,15 +47,12 @@ const Column: React.FC<ColumnProps> = ({ title, forms }) => {
       processedFormValues.channel = parseInt(formValues.channel);
     }
 
-    // Create a FormData object
     const formData = new FormData();
 
-    // Add processed form values to the FormData object
     for (const key in processedFormValues) {
       formData.append(key, processedFormValues[key].toString());
     }
 
-    // Log the contents of formData
     for (let pair of formData.entries()) {
       console.log(pair[0] + ', ' + pair[1]);
     }
@@ -63,20 +60,26 @@ const Column: React.FC<ColumnProps> = ({ title, forms }) => {
     try {
       const response = await fetch('http://localhost:8000/', {
         method: 'POST',
-        body: formData,  // Send the FormData object
+        body: formData,
       });
 
       if (!response.ok) {
         console.error('HTTP error', response.status);
       } else {
-        // Do something with the response
         const data = await response.json();
         console.log(data);
+        setImageUrl(data.image_url._url); // Updated this line
       }
     } catch (error) {
       console.error('Error:', error);
     }
   };
+
+  useEffect(() => {
+    if (imageUrl) {
+      router.push(`/display-image?image_url=${encodeURIComponent(imageUrl)}`);
+    }
+  }, [imageUrl, router]);
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col flex-grow border-1 rounded-md shadow-xl w-1/2 py-8 px-3 mb-3">

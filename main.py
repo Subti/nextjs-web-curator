@@ -199,9 +199,15 @@ async def create_home(request: Request,
 
     print(view_args.filename)
     image_filename = view_rec(view_args)
-    rec_dict = rec_args.dict()
-    view_dict = view_args
-    return templates.TemplateResponse('result.html', {"request": request, 'image_filename': image_filename, 'view_args': view_dict, 'rec_args': rec_dict, 'metadata': metadata["metadata"]})
+    image_url = request.url_for('static', path=image_filename)
+    print("hello")
+    print(image_url)
+
+    return {"image_url": image_url}
+    # image_filename = view_rec(view_args)
+    # rec_dict = rec_args.dict()
+    # view_dict = view_args
+    # return templates.TemplateResponse('result.html', {"request": request, 'image_filename': image_filename, 'view_args': view_dict, 'rec_args': rec_dict, 'metadata': metadata["metadata"]})
 
 
 def namespace_to_dict(namespace):
