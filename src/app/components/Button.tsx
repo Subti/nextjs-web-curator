@@ -11,14 +11,15 @@ import React from "react";
  */
 const Button = () => {
   // Click event handler function
-  const onClick = () => {
-    alert("Hello World!");
-  };
+  // const onClick = () => {
+  //   alert("Hello World!");
+  // };
 
   return (
     <button
-      className="text-xl text-white rounded-full px-7 py-3 bg-gradient-to-r from-[#2298dc] to-[#7a64a7]"
-      onClick={onClick} // Binding onClick function to onClick event
+      className="text-xl text-white rounded-full px-7 py-3 bg-gradient-to-r from-[#2298dc] to-[#7a64a7] w-40 self-center"
+      // onClick={onClick} // Binding onClick function to onClick event
+      type="submit"
     >
       Submit
     </button>
