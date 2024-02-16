@@ -1,5 +1,4 @@
 import React from "react";
-import Button from "./components/Button"; // Importing Button component
 import Column from "./components/Column"; // Importing Column component
 import Header from "./components/Header"; // Importing Header component
 import captureSettingsForms from "./modules/captureSettingsForms"; // Importing captureSettingsForms module
@@ -23,8 +22,6 @@ export default function Home() {
         {/* Rendering Column component with all forms */}
         <Column title="Capture Settings & Metadata" forms={allForms} />
       </div>
-      {/* Rendering Button component */}
-      <Button />
     </div>
   );
 }
