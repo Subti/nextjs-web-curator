@@ -9,7 +9,7 @@ import React from "react";
  * Displays a "Submit" button with a gradient background.
  * Alerts "Hello World!" when clicked.
  */
-const Button = () => {
+const Button = (props: any) => {
   // Click event handler function
   // const onClick = () => {
   //   alert("Hello World!");
@@ -17,11 +17,11 @@ const Button = () => {
 
   return (
     <button
-      className="text-xl text-white rounded-full px-7 py-3 bg-gradient-to-r from-[#2298dc] to-[#7a64a7] w-40 self-center"
+      className="text-xl text-white rounded-full px-7 py-3 bg-gradient-to-r from-[#2298dc] to-[#7a64a7] self-center"
       // onClick={onClick} // Binding onClick function to onClick event
-      type="submit"
+      type={props.type}
     >
-      Submit
+      {props.text}
     </button>
   );
 };
