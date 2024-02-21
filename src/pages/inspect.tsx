@@ -1,6 +1,5 @@
 import React from "react";
 import Header from "../app/components/Header"; // Importing Header component
-import "../app/globals.css"; // Importing global CSS styles
 
 export default function Inspect(props: any) {
   return (
