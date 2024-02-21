@@ -197,11 +197,9 @@ async def create_home(request: Request,
         filename=fullpath
     )
 
-    print(view_args.filename)
-    image_filename = view_rec(view_args)
-    image_url = request.url_for('static', path=image_filename)
-    print("hello")
-    print(image_url)
+    plot_data = view_rec(view_args)
+
+    return {"plot_data": plot_data}
 
     return {"image_url": image_url}
     # image_filename = view_rec(view_args)

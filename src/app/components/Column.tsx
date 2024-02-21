@@ -19,14 +19,10 @@ interface ColumnProps {
 
 const Column: React.FC<ColumnProps> = ({ title, forms }) => {
   const router = useRouter();
-  const [imageUrl, setImageUrl] = useState(null);
+  const [plotData, setPlotData] = useState(null);
   const [formValues, setFormValues] = useState<Record<string, string>>(
     forms.reduce((values, form) => ({ ...values, [form.id]: form.value }), {})
   );
-
-  // const handleFormChange = (id: string, value: string) => {
-  //   setFormValues(values => ({ ...values, [id]: value }));
-  // };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -56,10 +52,6 @@ const Column: React.FC<ColumnProps> = ({ title, forms }) => {
       formData.append(key, processedFormValues[key].toString());
     }
 
-    for (let pair of formData.entries()) {
-      console.log(pair[0] + ", " + pair[1]);
-    }
-
     try {
       const response = await fetch("http://localhost:8000/", {
         method: "POST",
@@ -71,7 +63,7 @@ const Column: React.FC<ColumnProps> = ({ title, forms }) => {
       } else {
         const data = await response.json();
         console.log(data);
-        setImageUrl(data.image_url._url); // Updated this line
+        setPlotData(data.plot_data); // Updated this line
       }
     } catch (error) {
       console.error("Error:", error);
@@ -79,10 +71,11 @@ const Column: React.FC<ColumnProps> = ({ title, forms }) => {
   };
 
   useEffect(() => {
-    if (imageUrl) {
-      router.push(`/display-image?image_url=${encodeURIComponent(imageUrl)}`);
+    if (plotData) {
+      const plotDataParam = encodeURIComponent(JSON.stringify(plotData));
+      router.push(`/plotly-test?plotData=${plotDataParam}`);
     }
-  }, [imageUrl, router]);
+  }, [plotData, router]);
 
   return (
     <form
@@ -92,7 +85,6 @@ const Column: React.FC<ColumnProps> = ({ title, forms }) => {
       <h2 className="text-center text-3xl text-[#2298dc] mb-7">{title}</h2>
       {forms.map((formData, index) => (
         <Form key={index} {...formData} />
-        // onChange={(value) => handleFormChange(formData.id, value)}
       ))}
       <Button />
     </form>
