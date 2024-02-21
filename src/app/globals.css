@@ -13,6 +13,14 @@
   border-bottom-width: 2px;
 }
 
+.custom-width-300 {
+  width: 300px;
+}
+
+.custom-height-300 {
+  height: 300px;
+}
+
 /* :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
