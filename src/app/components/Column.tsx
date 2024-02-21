@@ -94,7 +94,7 @@ const Column: React.FC<ColumnProps> = ({ title, forms }) => {
         <Form key={index} {...formData} />
         // onChange={(value) => handleFormChange(formData.id, value)}
       ))}
-      <Button />
+      <Button text="Submit" type="submit" />
     </form>
   );
 };
