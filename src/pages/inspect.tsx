@@ -75,6 +75,9 @@ export default function Inspect(props: any) {
     setStartPoint(null);
   };
 
+  const discardAndCaptureNew = async () => {
+    router.push("/");
+  };
   return (
     <div className="flex flex-col items-center justify-center">
       <Header title="Inspect Recording" />
@@ -122,9 +125,7 @@ export default function Inspect(props: any) {
           />
         )}
       </div>
-      <Button text="Discard and Capture New" />
+      <Button text="Discard and Capture New" onClick={discardAndCaptureNew} />
     </div>
   );
 }
-
-// min-h-screen
