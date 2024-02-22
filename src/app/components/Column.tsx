@@ -80,7 +80,7 @@ const Column: React.FC<ColumnProps> = ({ title, forms }) => {
 
   useEffect(() => {
     if (imageUrl) {
-      router.push(`/display-image?image_url=${encodeURIComponent(imageUrl)}`);
+      router.push(`/inspect?image_url=${encodeURIComponent(imageUrl)}`);
     }
   }, [imageUrl, router]);
 
