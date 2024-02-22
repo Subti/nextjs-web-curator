@@ -82,9 +82,9 @@ export default function Inspect(props: any) {
     <div className="flex flex-col items-center justify-center">
       <Header title="Inspect Recording" />
       <div className="flex justify-around w-3/4">
-        <ReviewSettings />
-        <ReviewSettings />
-        <ReviewSettings />
+        <ReviewSettings title="Recording Summary:" />
+        <ReviewSettings title="SDR Capture Settings:" />
+        <ReviewSettings title="Metadata:" />
       </div>
       <div
         style={{ position: "relative" }}
