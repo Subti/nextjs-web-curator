@@ -10,16 +10,11 @@ import React from "react";
  * Alerts "Hello World!" when clicked.
  */
 const Button = (props: any) => {
-  // Click event handler function
-  // const onClick = () => {
-  //   alert("Hello World!");
-  // };
-
   return (
     <button
       className="text-xl text-white rounded-full px-7 py-3 bg-gradient-to-r from-[#2298dc] to-[#7a64a7] self-center"
-      // onClick={onClick} // Binding onClick function to onClick event
       type={props.type}
+      onClick={props.onClick}
     >
       {props.text}
     </button>
