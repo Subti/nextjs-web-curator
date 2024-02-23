@@ -13,12 +13,16 @@
   border-bottom-width: 2px;
 }
 
-.custom-width-325 {
-  width: 325px;
+.custom-width-400 {
+  width: 400px;
 }
 
-.custom-height-325 {
-  height: 325px;
+.custom-height-400 {
+  height: 400px;
+}
+
+.custom-width-90-percent {
+  width: 90%;
 }
 
 /* :root {
