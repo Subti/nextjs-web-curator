@@ -79,51 +79,61 @@ export default function Inspect(props: any) {
     router.push("/");
   };
   return (
-    <div className="flex flex-col items-center justify-center">
+    <div className="flex flex-col items-center">
       <Header title="Inspect Recording" />
-      <div className="flex justify-around w-3/4">
-        <ReviewSettings title="Recording Summary:" />
-        <ReviewSettings title="SDR Capture Settings:" />
-        <ReviewSettings title="Metadata:" />
-      </div>
-      <div
-        style={{ position: "relative" }}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-      >
-        <img
-          ref={imageRef}
-          src={imageUrl}
-          alt="Generated"
-          style={{ position: "relative" }}
-          onLoad={handleImageLoad}
+      <div className="flex justify-between custom-width-90-percent">
+        <ReviewSettings
+          title="Recording Summary:"
+          renderFormAndButton={false}
         />
-        {rectangles.map((rect, i) => (
-          <div
-            key={i}
-            style={{
-              border: "1px solid red",
-              position: "absolute",
-              left: `${rect.x}px`,
-              top: `${rect.y}px`,
-              width: `${rect.width}px`,
-              height: `${rect.height}px`
-            }}
+        <ReviewSettings
+          title="SDR Capture Settings:"
+          renderFormAndButton={false}
+        />
+        <ReviewSettings title="Metadata:" renderFormAndButton={false} />
+      </div>
+      <div className="flex custom-width-90-percent justify-between">
+        <div
+          style={{ position: "relative" }}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          className="mt-5"
+        >
+          <img
+            ref={imageRef}
+            src={imageUrl}
+            alt="Generated"
+            style={{ position: "relative" }}
+            onLoad={handleImageLoad}
           />
-        ))}
-        {currentRect && (
-          <div
-            style={{
-              border: "1px solid red",
-              position: "absolute",
-              left: `${currentRect.x}px`,
-              top: `${currentRect.y}px`,
-              width: `${currentRect.width}px`,
-              height: `${currentRect.height}px`
-            }}
-          />
-        )}
+          {rectangles.map((rect, i) => (
+            <div
+              key={i}
+              style={{
+                border: "1px solid red",
+                position: "absolute",
+                left: `${rect.x}px`,
+                top: `${rect.y}px`,
+                width: `${rect.width}px`,
+                height: `${rect.height}px`
+              }}
+            />
+          ))}
+          {currentRect && (
+            <div
+              style={{
+                border: "1px solid red",
+                position: "absolute",
+                left: `${currentRect.x}px`,
+                top: `${currentRect.y}px`,
+                width: `${currentRect.width}px`,
+                height: `${currentRect.height}px`
+              }}
+            />
+          )}
+        </div>
+        <ReviewSettings title="Cut Points:" renderFormAndButton={true} />
       </div>
       <Button text="Discard and Capture New" onClick={discardAndCaptureNew} />
     </div>
