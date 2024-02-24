@@ -3,6 +3,8 @@ import { useRouter } from "next/router";
 import Header from "@/app/components/Header"; // Importing Header component
 import ReviewSettings from "@/app/components/ReviewSettings";
 import Button from "@/app/components/Button";
+import captureSettingsForms from "@/app/modules/captureSettingsForms";
+import metadataForms from "@/app/modules/metadataForms";
 
 interface Rectangle {
   x: number;
@@ -10,6 +12,27 @@ interface Rectangle {
   width: number;
   height: number;
 }
+
+const recordingSummaryForms = [
+  {
+    label: "Plot Time",
+    id: "plot_time",
+    name: "plot_time",
+    value: "full"
+  },
+  {
+    label: "Save Plot",
+    id: "save_plot",
+    name: "save_plot",
+    value: "True"
+  },
+  {
+    label: "File Name",
+    id: "file_name",
+    name: "file_name",
+    value: "recordings/iq24440MHz164450.npy"
+  }
+];
 
 export default function Inspect(props: any) {
   const [rectangles, setRectangles] = useState<Rectangle[]>([]);
@@ -85,12 +108,18 @@ export default function Inspect(props: any) {
         <ReviewSettings
           title="Recording Summary:"
           renderFormAndButton={false}
+          formData={recordingSummaryForms}
         />
         <ReviewSettings
           title="SDR Capture Settings:"
           renderFormAndButton={false}
+          formData={captureSettingsForms}
         />
-        <ReviewSettings title="Metadata:" renderFormAndButton={false} />
+        <ReviewSettings
+          title="Metadata:"
+          renderFormAndButton={false}
+          formData={metadataForms}
+        />
       </div>
       <div className="flex custom-width-90-percent justify-between">
         <div
@@ -133,7 +162,11 @@ export default function Inspect(props: any) {
             />
           )}
         </div>
-        <ReviewSettings title="Cut Points:" renderFormAndButton={true} />
+        <ReviewSettings
+          title="Cut Points:"
+          renderFormAndButton={true}
+          formData={null}
+        />
       </div>
       <Button text="Discard and Capture New" onClick={discardAndCaptureNew} />
     </div>
