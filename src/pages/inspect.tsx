@@ -3,8 +3,9 @@ import { useRouter } from "next/router";
 import Header from "@/app/components/Header"; // Importing Header component
 import ReviewSettings from "@/app/components/ReviewSettings";
 import Button from "@/app/components/Button";
-import captureSettingsForms from "@/app/modules/captureSettingsForms";
-import metadataForms from "@/app/modules/metadataForms";
+import captureSettingsData from "@/app/modules/captureSettingsData";
+import metadataData from "@/app/modules/metadataData";
+import recordingSummaryData from "@/app/modules/recordingSummaryData";
 
 interface Rectangle {
   x: number;
@@ -12,28 +13,6 @@ interface Rectangle {
   width: number;
   height: number;
 }
-
-const recordingSummaryForms = [
-  {
-    label: "Plot Time",
-    id: "plot_time",
-    name: "plot_time",
-    value: "full"
-  },
-  {
-    label: "Save Plot",
-    id: "save_plot",
-    name: "save_plot",
-    value: "True"
-  },
-  {
-    label: "File Name",
-    id: "file_name",
-    name: "file_name",
-    value: "recordings/iq24440MHz164450.npy"
-  }
-];
-
 export default function Inspect(props: any) {
   const [rectangles, setRectangles] = useState<Rectangle[]>([]);
   const [currentRect, setCurrentRect] = useState<Rectangle | null>(null);
@@ -100,6 +79,27 @@ export default function Inspect(props: any) {
 
   const discardAndCaptureNew = async () => {
     router.push("/");
+
+    const formData = new FormData();
+    formData.append("action", "discard");
+    formData.append("filename", "recordings/iq2440MHz171517.npy");
+
+    try {
+      const response = await fetch("http://localhost:8000/result", {
+        method: "POST",
+        body: formData
+      });
+
+      if (!response.ok) {
+        console.error("HTTP error", response.status);
+      } else {
+        const data = await response.json();
+        console.log(data);
+        console.log("Success");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
   return (
     <div className="flex flex-col items-center">
@@ -108,17 +108,17 @@ export default function Inspect(props: any) {
         <ReviewSettings
           title="Recording Summary:"
           renderFormAndButton={false}
-          formData={recordingSummaryForms}
+          formData={recordingSummaryData}
         />
         <ReviewSettings
           title="SDR Capture Settings:"
           renderFormAndButton={false}
-          formData={captureSettingsForms}
+          formData={captureSettingsData}
         />
         <ReviewSettings
           title="Metadata:"
           renderFormAndButton={false}
-          formData={metadataForms}
+          formData={metadataData}
         />
       </div>
       <div className="flex custom-width-90-percent justify-between">
