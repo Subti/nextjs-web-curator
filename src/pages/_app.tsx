@@ -1,4 +1,5 @@
 import { NextComponentType } from "next";
+import { DataProvider } from "@/context/DataContext";
 import "../app/globals.css";
 
 export default function MyApp({
@@ -8,5 +9,9 @@ export default function MyApp({
   Component: NextComponentType;
   pageProps: any;
 }) {
-  return <Component {...pageProps} />;
+  return (
+    <DataProvider>
+      <Component {...pageProps} />
+    </DataProvider>
+  );
 }
