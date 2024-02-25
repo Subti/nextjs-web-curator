@@ -1,8 +1,8 @@
 import React from "react";
 import Column from "./components/Column"; // Importing Column component
 import Header from "./components/Header"; // Importing Header component
-import captureSettingsForms from "./modules/captureSettingsForms"; // Importing captureSettingsForms module
-import metadataForms from "./modules/metadataForms"; // Importing metadataForms module
+import captureSettingsForms from "./modules/captureSettingsData"; // Importing captureSettingsForms module
+import metadataForms from "./modules/metadataData"; // Importing metadataForms module
 
 /**
  * Home Component
