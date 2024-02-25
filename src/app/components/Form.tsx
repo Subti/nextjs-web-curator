@@ -7,6 +7,7 @@ interface FormProps {
   label: string;
   id: string;
   value: string;
+  onChange: (value: string) => void; // Define the onChange prop
 }
 
 const Form: React.FC<FormProps> = (props) => {
@@ -15,12 +16,10 @@ const Form: React.FC<FormProps> = (props) => {
 
   // Event handler for input change
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setValue(event.target.value);
+    const value = event.target.value;
+    setValue(value); // Update local state
+    props.onChange(value); // Forward value to parent component
   };
-
-  // const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   onChange(id, event.target.value);
-  // };
 
   return (
     <>
