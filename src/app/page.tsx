@@ -1,8 +1,8 @@
 import React from "react";
 import Column from "./components/Column"; // Importing Column component
 import Header from "./components/Header"; // Importing Header component
-import captureSettingsForms from "./modules/captureSettingsData"; // Importing captureSettingsForms module
-import metadataForms from "./modules/metadataData"; // Importing metadataForms module
+import captureSettingsData from "./modules/captureSettingsData"; // Importing captureSettingsData module
+import metadataData from "./modules/metadataData"; // Importing metadataData module
 
 /**
  * Home Component
@@ -12,7 +12,7 @@ import metadataForms from "./modules/metadataData"; // Importing metadataForms m
  * and a button.
  */
 export default function Home() {
-  const allForms = [...captureSettingsForms, ...metadataForms];
+  const allForms = [...captureSettingsData, ...metadataData];
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
