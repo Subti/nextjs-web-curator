@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Form from "./Form";
 import Button from "./Button";
 
-interface FormData {
+interface MyFormProps {
   label: string;
   id: string;
   name: string;
@@ -14,19 +14,20 @@ interface FormData {
 
 interface ColumnProps {
   title: string;
-  forms: FormData[];
+  forms: MyFormProps[];
 }
 
 const Column: React.FC<ColumnProps> = ({ title, forms }) => {
   const router = useRouter();
   const [imageUrl, setImageUrl] = useState(null);
+  const [filename, setFilename] = useState(null);
   const [formValues, setFormValues] = useState<Record<string, string>>(
     forms.reduce((values, form) => ({ ...values, [form.id]: form.value }), {})
   );
 
-  // const handleFormChange = (id: string, value: string) => {
-  //   setFormValues(values => ({ ...values, [id]: value }));
-  // };
+  const handleFormChange = (id: string, value: string) => {
+    setFormValues(values => ({ ...values, [id]: value }));
+  };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -72,6 +73,7 @@ const Column: React.FC<ColumnProps> = ({ title, forms }) => {
         const data = await response.json();
         console.log(data);
         setImageUrl(data.image_url._url); // Updated this line
+        setFilename(data.filename); // Save the filename
       }
     } catch (error) {
       console.error("Error:", error);
@@ -79,10 +81,12 @@ const Column: React.FC<ColumnProps> = ({ title, forms }) => {
   };
 
   useEffect(() => {
-    if (imageUrl) {
-      router.push(`/display-image?image_url=${encodeURIComponent(imageUrl)}`);
+    if (imageUrl && filename) {
+      router.push(
+        `/display-image?image_url=${encodeURIComponent(imageUrl)}&protocol=${encodeURIComponent(formValues.protocol)}&num_samples=${encodeURIComponent(formValues.num_samples)}&sample_rate=${encodeURIComponent(formValues.sample_rate)}&filename=${encodeURIComponent(filename)}`
+      );
     }
-  }, [imageUrl, router]);
+  }, [imageUrl, router, formValues, filename]);
 
   return (
     <form
@@ -91,8 +95,11 @@ const Column: React.FC<ColumnProps> = ({ title, forms }) => {
     >
       <h2 className="text-center text-3xl text-[#2298dc] mb-7">{title}</h2>
       {forms.map((formData, index) => (
-        <Form key={index} {...formData} />
-        // onChange={(value) => handleFormChange(formData.id, value)}
+        <Form
+          key={index}
+          {...formData}
+          onChange={(value: string) => handleFormChange(formData.id, value)}
+        />
       ))}
       <Button />
     </form>

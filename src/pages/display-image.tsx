@@ -18,6 +18,10 @@ const DisplayImage: React.FC = () => {
   const imageRef = useRef<HTMLImageElement | null>(null);
 
   const router = useRouter();
+  const protocol = router.query.protocol;
+  const num_samples = router.query.num_samples;
+  const sample_rate = router.query.sample_rate;
+  const filename = router.query.filename;
   const imageUrl = decodeURIComponent(router.query.image_url as string);
 
   useEffect(() => {
@@ -37,11 +41,11 @@ const DisplayImage: React.FC = () => {
     const x = e.clientX - imageBounds.left;
     const y = e.clientY - imageBounds.top;
 
-    const minImageWidth = imageBounds.width * 0.125; // 12.5% of the image width
-    const maxImageWidth = imageBounds.width * 0.899; // 87.5% of the image width
+    const minImageWidth = imageBounds.width * 0.125; // Constrict bounding box to % of image width (start point)
+    const maxImageWidth = imageBounds.width * 0.899; // Constrict bounding box to % of image width (end point)
 
-    const minImageHeight = imageBounds.height * 0.465; // 12.5% of the image height
-    const maxImageHeight = imageBounds.height * 0.877; // 87.5% of the image height
+    const minImageHeight = imageBounds.height * 0.465; // Constrict bounding box to % of image height (start point)
+    const maxImageHeight = imageBounds.height * 0.877; // Constrict bounding box to % of image height (end point)
 
     if (x < minImageWidth || x > maxImageWidth || y < minImageHeight || y > maxImageHeight) return;
 
@@ -66,11 +70,11 @@ const DisplayImage: React.FC = () => {
       let width = e.clientX - startPoint.x - imageBounds.left;
       let height = e.clientY - startPoint.y - imageBounds.top;
 
-      const minImageWidth = imageBounds.width * 0.125; // 12.5% of the image width
-      const maxImageWidth = imageBounds.width * 0.899; // 87.5% of the image width
+      const minImageWidth = imageBounds.width * 0.125; // Cosntrict drawing to % of image width (start point)
+      const maxImageWidth = imageBounds.width * 0.899; // Constrict drawing to % of image width (end point)
 
-      const minImageHeight = imageBounds.height * 0.465; // 12.5% of the image height
-      const maxImageHeight = imageBounds.height * 0.877; // 87.5% of the image height
+      const minImageHeight = imageBounds.height * 0.465; // Constrict drawing to % of image height (start point)
+      const maxImageHeight = imageBounds.height * 0.877; // Constrict drawing to % of image height (end point)
 
       if (startPoint.x + width < minImageWidth) {
         width = minImageWidth - startPoint.x;
@@ -103,6 +107,41 @@ const DisplayImage: React.FC = () => {
   const handleDelete = (i: number) => {
     setRectangles((rects) => rects.filter((_, index) => index !== i));
     setSelectedRectangleIndex(null);
+  };
+
+  const convertToCutPoints = (rectangles: Rectangle[], imageWidth: number) => {
+    return rectangles.map(rect => {
+      const start = Math.round((rect.x / imageWidth) * 500);
+      const end = Math.round(((rect.x + rect.width) / imageWidth) * 500);
+      return `${start} ${end}`;
+    });
+  };
+
+  const handleSubmit = async () => {
+    if (!imageBounds) return;
+    const cutPoints = convertToCutPoints(rectangles, imageBounds.width).join(', ');
+
+    const requestBody = {
+      action: 'save',
+      cuts: cutPoints,
+      protocol: protocol,
+      filename: filename,
+      num_samples: num_samples,
+      sample_rate: sample_rate,
+    };
+
+    console.log(requestBody); // Log the request body
+
+    const response = await fetch('http://localhost:8000/result', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    const data = await response.json();
+    console.log(data);
   };
 
   return (
@@ -155,6 +194,9 @@ const DisplayImage: React.FC = () => {
           }}
         />
       )}
+      <button style={{ position: 'absolute', top: 0, right: 0, padding: '10px', backgroundColor: 'blue', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }} onClick={handleSubmit}>
+        Submit
+      </button>
     </div>
   );
 };

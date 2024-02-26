@@ -203,7 +203,7 @@ async def create_home(request: Request,
     print("hello")
     print(image_url)
 
-    return {"image_url": image_url}
+    return {"image_url": image_url, "filename": fullpath}
     # image_filename = view_rec(view_args)
     # rec_dict = rec_args.dict()
     # view_dict = view_args
