@@ -110,7 +110,7 @@ const DisplayImage: React.FC = () => {
   };
 
   const convertToCutPoints = (rectangles: Rectangle[], imageWidth: number, numSamples: number) => {
-    const maxTime = (numSamples / 10000000) * 500; // Calculate the maximum time based on the sample rate
+    const maxTime = (numSamples / 10000000) * 500; // Calculate the maximum time based on the num_samples
 
     const minImageWidth = imageWidth * 0.125; // Start of the constricted part
     const maxImageWidth = imageWidth * 0.899; // End of the constricted part
