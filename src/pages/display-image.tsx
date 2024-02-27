@@ -109,17 +109,23 @@ const DisplayImage: React.FC = () => {
     setSelectedRectangleIndex(null);
   };
 
-  const convertToCutPoints = (rectangles: Rectangle[], imageWidth: number) => {
+  const convertToCutPoints = (rectangles: Rectangle[], imageWidth: number, numSamples: number) => {
+    const maxTime = (numSamples / 10000000) * 500; // Calculate the maximum time based on the sample rate
+
+    const minImageWidth = imageWidth * 0.125; // Start of the constricted part
+    const maxImageWidth = imageWidth * 0.899; // End of the constricted part
+    const constrictedWidth = maxImageWidth - minImageWidth; // Width of the constricted part
+
     return rectangles.map(rect => {
-      const start = Math.round((rect.x / imageWidth) * 500);
-      const end = Math.round(((rect.x + rect.width) / imageWidth) * 500);
+      const start = Math.round(((rect.x - minImageWidth) / constrictedWidth) * maxTime);
+      const end = Math.round((((rect.x + rect.width) - minImageWidth) / constrictedWidth) * maxTime);
       return `${start} ${end}`;
     });
   };
 
   const handleSubmit = async () => {
     if (!imageBounds) return;
-    const cutPoints = convertToCutPoints(rectangles, imageBounds.width).join(', ');
+    const cutPoints = convertToCutPoints(rectangles, imageBounds.width, Number(num_samples)).join(', ');
 
     const requestBody = {
       action: 'save',
