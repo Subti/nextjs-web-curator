@@ -1,42 +1,39 @@
 "use client";
 
-import React from "react";
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 interface FormProps {
   label: string;
   id: string;
   value: string;
+  onChange: (value: string) => void; // Add this line
 }
 
-const Form: React.FC<FormProps> = (props) => {
-  // Event handler for input change
-  const [value, setValue] = useState(props.value);
+const Form: React.FC<FormProps> = ({ label, id, value: initialValue, onChange }) => {
+  const [currentValue, setCurrentValue] = useState(initialValue);
 
-  // Event handler for input change
+  useEffect(() => {
+    setCurrentValue(initialValue);
+  }, [initialValue]);
+
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setValue(event.target.value);
+    setCurrentValue(event.target.value);
+    onChange(event.target.value);
   };
-
-  // const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   onChange(id, event.target.value);
-  // };
 
   return (
     <>
-      {/* Rendering label for the form field */}
-      <label className="font-bold text-[18px] mb-2">{props.label}:</label>
-      {/* Input field */}
+      <label className="font-bold text-[18px] mb-2">{label}:</label>
       <input
         className="mb-2 py-2 mb-8 custom-border-input"
         type="text"
-        id={props.id}
-        name={props.id}
-        value={value}
-        onChange={handleChange} // Binding handleChange function to onChange event
+        id={id}
+        name={id}
+        value={currentValue}
+        onChange={handleChange}
       />
     </>
   );
 };
 
-export default Form; // Exporting Form component
+export default Form;

@@ -37,3 +37,8 @@ next-env.d.ts
 
 # recordings
 /recordings
+
+*.npy
+*.jpg
+*.svg
+*.dat

@@ -1,0 +1,17 @@
+numpy 
+scipy 
+pandas
+pyarrow
+airium
+matplotlib
+sigmf
+cffi
+pyyaml
+h5py
+pycairo #sudo apt install libcairo2-dev pkg-config python3-dev
+fastapi
+python-multipart
+starlette
+uvicorn[standard]
+Flask
+
