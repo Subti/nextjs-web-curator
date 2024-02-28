@@ -267,13 +267,11 @@ async def result(
 
     if action == "discard":
         # Delete files and redirect to index.html
-        print("skipping discarding image, will overwrite.")
+        print("Skipping discarding image, will overwrite.")
         if os.path.isfile(filename):
             os.remove(filename)
-        # Redirect to index.html
-        return Response(
-            content=get_index_html(**default_values), media_type="text/html"
-        )
+            print("Capture deleted")
+        return Response("Capture deleted")
 
     elif action == "save":
         if cuts and protocol and filename and num_samples and sample_rate:
