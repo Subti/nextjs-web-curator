@@ -3,9 +3,6 @@ import { useRouter } from "next/router";
 import Header from "@/app/components/Header"; // Importing Header component
 import ReviewSettings from "@/app/components/ReviewSettings";
 import Button from "@/app/components/Button";
-import captureSettingsData from "@/app/modules/captureSettingsData";
-import metadataData from "@/app/modules/metadataData";
-import recordingSummaryData from "@/app/modules/recordingSummaryData";
 
 interface Rectangle {
   x: number;
@@ -25,10 +22,10 @@ export default function Inspect(props: any) {
   const router = useRouter();
 
   let recordingSummary = decodeURIComponent(router.query.rec_summary as string);
-  const captureSettings = decodeURIComponent(
+  let captureSettings = decodeURIComponent(
     router.query.capture_settings as string
   );
-  const metadata = decodeURIComponent(router.query.metadata as string);
+  let metadata = decodeURIComponent(router.query.metadata as string);
   const imageUrl = router.query.image_url
     ? decodeURIComponent(router.query.image_url as string)
     : "";
@@ -117,17 +114,17 @@ export default function Inspect(props: any) {
         <ReviewSettings
           title="Recording Summary:"
           renderFormAndButton={false}
-          formData={recordingSummaryData}
+          formData={recordingSummary}
         />
         <ReviewSettings
           title="SDR Capture Settings:"
           renderFormAndButton={false}
-          formData={captureSettingsData}
+          formData={captureSettings}
         />
         <ReviewSettings
           title="Metadata:"
           renderFormAndButton={false}
-          formData={metadataData}
+          formData={metadata}
         />
       </div>
       <div className="flex custom-width-90-percent justify-between">
