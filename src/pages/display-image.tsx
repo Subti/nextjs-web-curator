@@ -125,25 +125,27 @@ const DisplayImage: React.FC = () => {
 
   const handleSubmit = async () => {
     if (!imageBounds) return;
-    const cutPoints = convertToCutPoints(rectangles, imageBounds.width, Number(num_samples)).join(', ');
+    const cutPoints = convertToCutPoints(rectangles, imageBounds.width, Number(num_samples)).join(' ');
 
-    const requestBody = {
-      action: 'save',
-      cuts: cutPoints,
-      protocol: protocol,
-      filename: filename,
-      num_samples: num_samples,
-      sample_rate: sample_rate,
-    };
-
-    console.log(requestBody); // Log the request body
+    const formData = new FormData();
+    formData.append('action', 'save');
+    formData.append('cuts', cutPoints);
+    if (typeof protocol === 'string') {
+      formData.append('protocol', protocol);
+    }
+    if (typeof filename === 'string') {
+      formData.append('filename', filename);
+    }
+    if (typeof num_samples === 'string') {
+      formData.append('num_samples', num_samples);
+    }
+    if (typeof sample_rate === 'string') {
+      formData.append('sample_rate', sample_rate);
+    }
 
     const response = await fetch('http://localhost:8000/result', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(requestBody),
+      body: formData,
     });
 
     const data = await response.json();
