@@ -11,6 +11,8 @@ import pathlib
 import pandas as pd
 import numpy as np
 from queue import Queue
+import asyncio
+import json
 
 from fastapi import FastAPI, Request, Form, Response, HTTPException, Body
 from fastapi.templating import Jinja2Templates
@@ -44,7 +46,6 @@ app = FastAPI()
 
 origins = [
     "http://localhost:3000",  # React app address
-    # add more origins if needed
 ]
 
 app.add_middleware(
@@ -208,16 +209,12 @@ async def create_home(
     print(image_url)
 
     rec_dict = rec_args.dict()
-    view_dict = view_args
-
-    print("Recording Summary: ", view_dict)
-    print("Capture Settings: ", rec_dict)
-    print("Metadata: ", metadata)
+    view_dict = vars(view_args)
 
     return {
         "image_url": image_url,
-        "rec_args": rec_dict,
-        "capture_args": view_dict,
+        "rec_args": view_dict,
+        "capture_args": rec_dict,
         "metadata": metadata,
     }
 
