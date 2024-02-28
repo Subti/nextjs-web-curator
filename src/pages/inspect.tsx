@@ -24,9 +24,7 @@ export default function Inspect(props: any) {
   const imageRef = useRef<HTMLImageElement | null>(null);
   const router = useRouter();
 
-  const recordingSummary = decodeURIComponent(
-    router.query.rec_summary as string
-  );
+  let recordingSummary = decodeURIComponent(router.query.rec_summary as string);
   const captureSettings = decodeURIComponent(
     router.query.capture_settings as string
   );
@@ -89,9 +87,11 @@ export default function Inspect(props: any) {
   const discardAndCaptureNew = async () => {
     router.push("/");
 
+    recordingSummary = JSON.parse(recordingSummary);
+
     const formData = new FormData();
     formData.append("action", "discard");
-    formData.append("filename", "recordings/iq2440MHz171517.npy");
+    formData.append("filename", `${(recordingSummary as any).filename}`);
 
     try {
       const response = await fetch("http://localhost:8000/result", {
@@ -102,9 +102,8 @@ export default function Inspect(props: any) {
       if (!response.ok) {
         console.error("HTTP error", response.status);
       } else {
-        const data = await response.json();
+        const data = await response.text();
         console.log(data);
-        console.log("Success");
       }
     } catch (error) {
       console.error("Error:", error);
