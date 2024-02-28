@@ -37,6 +37,7 @@ next-env.d.ts
 
 # recordings
 /recordings
+/slice_review
 
 *.npy
 *.jpg

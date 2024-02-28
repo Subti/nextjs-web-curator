@@ -109,35 +109,43 @@ const DisplayImage: React.FC = () => {
     setSelectedRectangleIndex(null);
   };
 
-  const convertToCutPoints = (rectangles: Rectangle[], imageWidth: number) => {
+  const convertToCutPoints = (rectangles: Rectangle[], imageWidth: number, numSamples: number) => {
+    const maxTime = (numSamples / 10000000) * 500; // Calculate the maximum time based on the num_samples
+
+    const minImageWidth = imageWidth * 0.125; // Start of the constricted part
+    const maxImageWidth = imageWidth * 0.899; // End of the constricted part
+    const constrictedWidth = maxImageWidth - minImageWidth; // Width of the constricted part
+
     return rectangles.map(rect => {
-      const start = Math.round((rect.x / imageWidth) * 500);
-      const end = Math.round(((rect.x + rect.width) / imageWidth) * 500);
+      const start = Math.round(((rect.x - minImageWidth) / constrictedWidth) * maxTime);
+      const end = Math.round((((rect.x + rect.width) - minImageWidth) / constrictedWidth) * maxTime);
       return `${start} ${end}`;
     });
   };
 
   const handleSubmit = async () => {
     if (!imageBounds) return;
-    const cutPoints = convertToCutPoints(rectangles, imageBounds.width).join(', ');
+    const cutPoints = convertToCutPoints(rectangles, imageBounds.width, Number(num_samples)).join(' ');
 
-    const requestBody = {
-      action: 'save',
-      cuts: cutPoints,
-      protocol: protocol,
-      filename: filename,
-      num_samples: num_samples,
-      sample_rate: sample_rate,
-    };
-
-    console.log(requestBody); // Log the request body
+    const formData = new FormData();
+    formData.append('action', 'save');
+    formData.append('cuts', cutPoints);
+    if (typeof protocol === 'string') {
+      formData.append('protocol', protocol);
+    }
+    if (typeof filename === 'string') {
+      formData.append('filename', filename);
+    }
+    if (typeof num_samples === 'string') {
+      formData.append('num_samples', num_samples);
+    }
+    if (typeof sample_rate === 'string') {
+      formData.append('sample_rate', sample_rate);
+    }
 
     const response = await fetch('http://localhost:8000/result', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(requestBody),
+      body: formData,
     });
 
     const data = await response.json();

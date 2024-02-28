@@ -19,19 +19,14 @@ def load_file(filename):
 
 
 def npy_slicer(args):
-
-
     ##open the files
     iqdata, metaf, extended_metaf = load_file(args.source_signal_file)
 
-
-
     ### slice decision handling
-    cuts = list(args.cuts)
+    cuts = list(map(int, args.cuts))
     cuts.sort()
     n_cuts = len(cuts)
     print(f"Will perform {n_cuts} cuts on {args.source_signal_file}")
-
 
     ###folder / file handling for output file
     target_folder_name = str(args.target_folder)
@@ -39,15 +34,24 @@ def npy_slicer(args):
     target_folder = pathlib.Path(target_folder_name)
 
     for index, cut in enumerate(cuts):
-        slicelen = cut if index == 0 else cut - cuts[index-1]
-        slice_data =np.zeros([2,slicelen])
         slicestart = 0 if index == 0 else cuts[index-1]
         slicestop = cut
+
+        # Ensure slicestop is within the bounds of the iqdata array
+        slicestop = min(slicestop, iqdata.shape[1])
+
+        # Ensure slicelen matches the actual slice length
+        slicelen = slicestop - slicestart
+
+        if slicelen < 0:
+            print(f"Skipping cut number {index}: slicestart ({slicestart}) is greater than slicestop ({slicestop})")
+            continue
+
+        slice_data = np.zeros([2, slicelen])
 
         print(f"cut number {index}: from {slicestart} to {slicestop}, length {len(slice_data[0,:])}")
         slice_data[0,:] = iqdata[0,slicestart:slicestop]
         slice_data[1,:] = iqdata[1,slicestart:slicestop]
-
 
         # file handling
         signalfilename = pathlib.Path(args.source_signal_file)
@@ -64,16 +68,9 @@ def npy_slicer(args):
             if extended_metaf:
                 np.save(f,extended_meta) 
 
-
-
-
     print("slicing completed")
 
-
-
-
 if __name__ == '__main__':
-    
     #parse arguments if theyre provided
     parser = argparse.ArgumentParser(description='NPY_SLICER - splits up a file into user defined slices and saves to a destination folder.')
     parser.add_argument("--source_signal_file", "-s", help="Source signal (can be a path)")
@@ -82,4 +79,3 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     npy_slicer(args)
-
