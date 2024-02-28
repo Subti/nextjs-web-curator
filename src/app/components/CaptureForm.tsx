@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useData } from "@/context/DataContext";
 import CaptureInput from "./CaptureInput";
 import Button from "./Button";
 
@@ -21,10 +20,12 @@ interface CaptureFormProps {
 const CaptureForm: React.FC<CaptureFormProps> = ({ title, forms }) => {
   const router = useRouter();
   const [imageUrl, setImageUrl] = useState(null);
+  const [captureSettings, setCaptureSettings] = useState({});
+  const [recordingSummary, setRecordingSummary] = useState({});
+  const [metadata, setMetadata] = useState({});
   const [formValues, setFormValues] = useState<Record<string, string>>(
     forms.reduce((values, form) => ({ ...values, [form.id]: form.value }), {})
   );
-  const { captureSettingsData, setCaptureSettingsData } = useData();
 
   const handleFormChange = (id: string, value: string) => {
     setFormValues((values) => ({ ...values, [id]: value }));
@@ -72,7 +73,9 @@ const CaptureForm: React.FC<CaptureFormProps> = ({ title, forms }) => {
         console.error("HTTP error", response.status);
       } else {
         const data = await response.json();
-        setCaptureSettingsData(data); // Update state
+        setRecordingSummary(data.rec_args);
+        setCaptureSettings(data.capture_args);
+        setMetadata(data.metadata.metadata);
         setImageUrl(data.image_url._url);
       }
     } catch (error) {
@@ -81,10 +84,18 @@ const CaptureForm: React.FC<CaptureFormProps> = ({ title, forms }) => {
   };
 
   useEffect(() => {
-    if (imageUrl && captureSettingsData) {
-      router.push(`/inspect?image_url=${encodeURIComponent(imageUrl)}`);
+    if (imageUrl) {
+      router.push(
+        `/inspect?image_url=${encodeURIComponent(
+          imageUrl
+        )}&rec_summary=${encodeURIComponent(
+          JSON.stringify(recordingSummary)
+        )}&capture_settings=${encodeURIComponent(
+          JSON.stringify(captureSettings)
+        )}&metadata=${encodeURIComponent(JSON.stringify(metadata))}`
+      );
     }
-  }, [imageUrl, captureSettingsData, router]);
+  }, [imageUrl, router]);
 
   return (
     <form

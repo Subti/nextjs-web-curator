@@ -1,10 +1,9 @@
 import React, { useState, MouseEvent, useRef, useEffect } from "react";
 import { useRouter } from "next/router";
-import { useData } from "@/context/DataContext";
 import Header from "@/app/components/Header"; // Importing Header component
 import ReviewSettings from "@/app/components/ReviewSettings";
 import Button from "@/app/components/Button";
-// import captureSettingsData from "@/app/modules/captureSettingsData";
+import captureSettingsData from "@/app/modules/captureSettingsData";
 import metadataData from "@/app/modules/metadataData";
 import recordingSummaryData from "@/app/modules/recordingSummaryData";
 
@@ -23,8 +22,15 @@ export default function Inspect(props: any) {
   const [imageBounds, setImageBounds] = useState<DOMRect | null>(null);
 
   const imageRef = useRef<HTMLImageElement | null>(null);
-  const { captureSettingsData } = useData();
   const router = useRouter();
+
+  const recordingSummary = decodeURIComponent(
+    router.query.rec_summary as string
+  );
+  const captureSettings = decodeURIComponent(
+    router.query.capture_settings as string
+  );
+  const metadata = decodeURIComponent(router.query.metadata as string);
   const imageUrl = router.query.image_url
     ? decodeURIComponent(router.query.image_url as string)
     : "";
@@ -104,10 +110,6 @@ export default function Inspect(props: any) {
       console.error("Error:", error);
     }
   };
-
-  useEffect(() => {
-    console.log("Capture Settings Data:", captureSettingsData);
-  }, [captureSettingsData]);
 
   return (
     <div className="flex flex-col items-center">
