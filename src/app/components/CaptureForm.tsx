@@ -84,7 +84,7 @@ const CaptureForm: React.FC<CaptureFormProps> = ({ title, forms }) => {
   };
 
   useEffect(() => {
-    if (imageUrl) {
+    if (imageUrl && recordingSummary && captureSettings && metadata) {
       router.push(
         `/inspect?image_url=${encodeURIComponent(
           imageUrl
@@ -95,7 +95,7 @@ const CaptureForm: React.FC<CaptureFormProps> = ({ title, forms }) => {
         )}&metadata=${encodeURIComponent(JSON.stringify(metadata))}`
       );
     }
-  }, [imageUrl, router]);
+  }, [imageUrl, recordingSummary, captureSettings, metadata, router]);
 
   return (
     <form
