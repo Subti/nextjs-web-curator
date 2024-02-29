@@ -99,6 +99,23 @@ const DisplayImage: React.FC = () => {
 
   const handleMouseUp = () => {
     if (!currentRect) return;
+
+    // Check if the new rectangle would overlap with any existing rectangles
+    const wouldOverlap = rectangles.some(
+      rect =>
+        currentRect.x < rect.x + rect.width &&
+        currentRect.x + currentRect.width > rect.x &&
+        currentRect.y < rect.y + rect.height &&
+        currentRect.y + currentRect.height > rect.y
+    );
+    if (wouldOverlap) {
+      // If the new rectangle would overlap, show an alert and don't add it
+      alert('You cannot overlap the bounding boxes.');
+      setCurrentRect(null);
+      setStartPoint(null);
+      return;
+    }
+
     setRectangles([...rectangles, currentRect]);
     setCurrentRect(null);
     setStartPoint(null);
