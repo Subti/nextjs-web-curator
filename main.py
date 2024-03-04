@@ -74,6 +74,8 @@ default_values = {
     'passes':f"{passes}"
 }
 
+data_store = {}
+
 class RecArgs(BaseModel):
     ip_addr: str
     num_samples: int
@@ -269,6 +271,11 @@ async def result(request: Request, action: str = Form(...), cuts: str = Form(Non
                     cuts=cuts_list
                 )
 
+                slice_dir = pathlib.Path.cwd() / 'slice_review' / protocol
+                static_dir = pathlib.Path.cwd() / 'static' / protocol
+
+                old_slice_files = [f for dp, dn, filenames in os.walk(slice_dir) for f in filenames if pathlib.Path(f).suffix in ['.npy']]
+
                 npy_slicer(cuts_args)
 
                 backup_folder = "../rec_backups/"
@@ -280,15 +287,30 @@ async def result(request: Request, action: str = Form(...), cuts: str = Form(Non
                 except Exception as e:
                     print("An error occurred:", e)
 
+
                 html_filename = signal_folder_inspector_npy2(f"./slice_review/","collect")
-                all_files = [str(pathlib.Path(dp) / f) for dp, dn, filenames in os.walk(pathlib.Path('slice_review')) for f in filenames if pathlib.Path(f).suffix in ['.png', '.svg']]
-                print(f"All files:{all_files}")
-                return templates.TemplateResponse(html_filename, {"request": request, "recordings": all_files})
+                new_slice_files = [f for dp, dn, filenames in os.walk(slice_dir) for f in filenames if pathlib.Path(f).suffix in ['.npy']]
+                newly_created_files = list(set(new_slice_files) - set(old_slice_files))
+                all_files = [str(pathlib.Path(dp).relative_to(static_dir) / f) for dp, dn, filenames in os.walk(static_dir) for f in filenames if pathlib.Path(f).suffix in ['.svg'] and pathlib.Path(f).stem in [pathlib.Path(sf).stem for sf in newly_created_files]]
+        
+                image_urls = [str(request.url_for('static', path=str(static_dir / f))) for f in all_files]
+
+                print(image_urls)
+                print(all_files)
+
+                result = {"files": all_files, "image_urls": image_urls}
+                data_store['result'] = result
+        
+                return result
 
         else:
             return {"error": "Required form data missing"}
 
     return "Invalid request"
+
+@app.get("/result")
+async def get_result():
+    return data_store.get('result', {})
 
 class Files(BaseModel):
     selectedFiles: List[str]

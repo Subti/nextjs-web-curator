@@ -14,6 +14,8 @@ const DisplayImage: React.FC = () => {
   const [startPoint, setStartPoint] = useState<{ x: number; y: number } | null>(null);
   const [imageBounds, setImageBounds] = useState<DOMRect | null>(null);
   const [selectedRectangleIndex, setSelectedRectangleIndex] = useState<number | null>(null);
+  const [cutPoints, setCutPoints] = useState<string[]>([]);
+
 
   const imageRef = useRef<HTMLImageElement | null>(null);
 
@@ -98,7 +100,7 @@ const DisplayImage: React.FC = () => {
   };
 
   const handleMouseUp = () => {
-    if (!currentRect) return;
+    if (!currentRect || !imageBounds) return;
 
     // Check if the new rectangle would overlap with any existing rectangles
     const wouldOverlap = rectangles.some(
@@ -116,9 +118,15 @@ const DisplayImage: React.FC = () => {
       return;
     }
 
-    setRectangles([...rectangles, currentRect]);
+    const newRectangles = [...rectangles, { ...currentRect, id: Date.now().toString() }];
+    setRectangles(newRectangles);
     setCurrentRect(null);
     setStartPoint(null);
+
+    // Calculate cutPoints immediately after a rectangle is drawn
+    const newCutPoints = convertToCutPoints(newRectangles, imageBounds.width, Number(num_samples));
+    setCutPoints(newCutPoints);
+    console.log(newCutPoints);
   };
 
   const handleDelete = (i: number) => {
@@ -138,6 +146,20 @@ const DisplayImage: React.FC = () => {
       const end = Math.round((((rect.x + rect.width) - minImageWidth) / constrictedWidth) * maxTime);
       return `${start} ${end}`;
     });
+  };
+
+  const calculateCutPointPosition = (rectangle: Rectangle, cutPoint: string, imageWidth: number) => {
+    const [start, end] = cutPoint.split(' ').map(Number);
+    const maxTime = (Number(num_samples) / 10000000) * 500; // Calculate the maximum time based on the num_samples
+
+    const minImageWidth = imageWidth * 0.125; // Start of the constricted part
+    const maxImageWidth = imageWidth * 0.899; // End of the constricted part
+    const constrictedWidth = maxImageWidth - minImageWidth; // Width of the constricted part
+
+    const startPosition = ((start / maxTime) * constrictedWidth) + minImageWidth;
+    const endPosition = ((end / maxTime) * constrictedWidth) + minImageWidth;
+
+    return { start: startPosition, end: endPosition };
   };
 
   const handleSubmit = async () => {
@@ -183,30 +205,77 @@ const DisplayImage: React.FC = () => {
         style={{ position: 'absolute', transform: 'scale(1)', transformOrigin: 'top left' }} // Test scaling here by changing the scale number to whatever you want
         onLoad={handleImageLoad}
       />
-      {rectangles.map((rect, i) => (
-        <div
-          key={i}
-          style={{
-            border: '1px solid red',
-            position: 'absolute',
-            left: `${rect.x}px`,
-            top: `${rect.y}px`,
-            width: `${rect.width}px`,
-            height: `${rect.height}px`,
-          }}
-        >
-          {i === selectedRectangleIndex && (
-            <>
-              <button style={{ position: 'absolute', right: 0, top: 0 }} onClick={() => handleDelete(i)}>
-                Delete
-              </button>
-              <button style={{ position: 'absolute', right: 0, bottom: 0 }} onClick={() => setSelectedRectangleIndex(null)}>
-                Deselect
-              </button>
-            </>
-          )}
-        </div>
-      ))}
+      {imageBounds && rectangles.map((rect, i) => {
+        const cutPoint = cutPoints[i];
+        let start = 0;
+        let end = 0;
+        if (cutPoint) {
+          const positions = calculateCutPointPosition(rect, cutPoint, imageBounds.width);
+          start = positions.start;
+          end = positions.end;
+        }
+        return (
+          <>
+            <div
+              key={`line-start-${i}`}
+              style={{
+                borderLeft: '2px dashed black',
+                position: 'absolute',
+                left: `${rect.x}px`,
+                top: `${imageBounds.height / 20}px`,
+                height: `${imageBounds.height / 2.45}px`,
+              }}
+            />
+            {cutPoint && (
+              <div
+                key={`cutpoint-${i}`}
+                style={{
+                  position: 'absolute',
+                  left: `${start}px`,
+                  top: `${imageBounds.height / 20}px`,
+                  width: `${end - start}px`,
+                  height: `${imageBounds.height / 2.45}px`,
+                  backgroundColor: 'rgba(255, 0, 0, 0.5)', // Change this to whatever you want
+                }}
+              >
+                {`Start: ${cutPoint.split(' ')[0]}, End: ${cutPoint.split(' ')[1]}`}
+              </div>
+            )}
+            <div
+              key={`line-end-${i}`}
+              style={{
+                borderLeft: '2px dashed black',
+                position: 'absolute',
+                left: `${rect.x + rect.width}px`,
+                top: `${imageBounds.height / 20}px`,
+                height: `${imageBounds.height / 2.45}px`,
+              }}
+            />
+            <div
+              key={i}
+              style={{
+                border: '1px solid red',
+                position: 'absolute',
+                left: `${rect.x}px`,
+                top: `${rect.y}px`,
+                width: `${rect.width}px`,
+                height: `${rect.height}px`,
+              }}
+            >
+              {i === selectedRectangleIndex && (
+                <>
+                  <button style={{ position: 'absolute', right: 0, top: 0 }} onClick={() => handleDelete(i)}>
+                    Delete
+                  </button>
+                  <button style={{ position: 'absolute', right: 0, bottom: 0 }} onClick={() => setSelectedRectangleIndex(null)}>
+                    Deselect
+                  </button>
+                </>
+              )}
+            </div>
+          </>
+        )
+      })}
       {currentRect && (
         <div
           style={{
