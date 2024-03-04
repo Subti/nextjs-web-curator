@@ -1,0 +1,7 @@
+metadata:
+  protocol: Wifi-BGN
+  use_case: ambient
+  testbed: Portable-Blade
+  transmitters: Ambient
+  project_name: Collision2023
+  sdr: synth

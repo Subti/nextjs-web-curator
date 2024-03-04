@@ -1,0 +1,12 @@
+__pycache__
+sdrenv
+venv
+recordings
+*.npy
+.venv
+annotations
+
+
+*.png
+
+__pycache__

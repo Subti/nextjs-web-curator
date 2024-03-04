@@ -1,0 +1,18 @@
+pyadi-iio
+paramiko
+numpy
+sigmf
+pyyaml
+cffi
+pyrtlsdr # requires sudo apt-get install librtlsdr-dev
+opencv-python
+matplotlib
+scipy
+zmq
+psutil
+pycairo # sudo apt install libcairo2-dev pkg-config python3-dev
+#scikit-image
+pympler
+GPUtil
+psutil
+pyhackrf
