@@ -2,31 +2,33 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Form from "./Form";
+import CaptureInput from "./CaptureInput";
 import Button from "./Button";
 
-interface MyFormProps {
+interface FormData {
   label: string;
   id: string;
   name: string;
   value: string;
 }
 
-interface ColumnProps {
+interface CaptureFormProps {
   title: string;
-  forms: MyFormProps[];
+  forms: FormData[];
 }
 
-const Column: React.FC<ColumnProps> = ({ title, forms }) => {
+const CaptureForm: React.FC<CaptureFormProps> = ({ title, forms }) => {
   const router = useRouter();
   const [imageUrl, setImageUrl] = useState(null);
-  const [filename, setFilename] = useState(null);
+  const [captureSettings, setCaptureSettings] = useState({});
+  const [recordingSummary, setRecordingSummary] = useState({});
+  const [metadata, setMetadata] = useState({});
   const [formValues, setFormValues] = useState<Record<string, string>>(
     forms.reduce((values, form) => ({ ...values, [form.id]: form.value }), {})
   );
 
   const handleFormChange = (id: string, value: string) => {
-    setFormValues(values => ({ ...values, [id]: value }));
+    setFormValues((values) => ({ ...values, [id]: value }));
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -71,9 +73,10 @@ const Column: React.FC<ColumnProps> = ({ title, forms }) => {
         console.error("HTTP error", response.status);
       } else {
         const data = await response.json();
-        console.log(data);
-        setImageUrl(data.image_url._url); // Updated this line
-        setFilename(data.filename); // Save the filename
+        setRecordingSummary(data.rec_args);
+        setCaptureSettings(data.capture_args);
+        setMetadata(data.metadata.metadata);
+        setImageUrl(data.image_url._url);
       }
     } catch (error) {
       console.error("Error:", error);
@@ -81,12 +84,18 @@ const Column: React.FC<ColumnProps> = ({ title, forms }) => {
   };
 
   useEffect(() => {
-    if (imageUrl && filename) {
+    if (imageUrl && recordingSummary && captureSettings && metadata) {
       router.push(
-        `/display-image?image_url=${encodeURIComponent(imageUrl)}&protocol=${encodeURIComponent(formValues.protocol)}&num_samples=${encodeURIComponent(formValues.num_samples)}&sample_rate=${encodeURIComponent(formValues.sample_rate)}&filename=${encodeURIComponent(filename)}`
+        `/inspect?image_url=${encodeURIComponent(
+          imageUrl
+        )}&rec_summary=${encodeURIComponent(
+          JSON.stringify(recordingSummary)
+        )}&capture_settings=${encodeURIComponent(
+          JSON.stringify(captureSettings)
+        )}&metadata=${encodeURIComponent(JSON.stringify(metadata))}`
       );
     }
-  }, [imageUrl, router, formValues, filename]);
+  }, [imageUrl, recordingSummary, captureSettings, metadata, router]);
 
   return (
     <form
@@ -95,15 +104,15 @@ const Column: React.FC<ColumnProps> = ({ title, forms }) => {
     >
       <h2 className="text-center text-3xl text-[#2298dc] mb-7">{title}</h2>
       {forms.map((formData, index) => (
-        <Form
+        <CaptureInput
           key={index}
           {...formData}
           onChange={(value: string) => handleFormChange(formData.id, value)}
         />
       ))}
-      <Button />
+      <Button text="Submit" type="submit" />
     </form>
   );
 };
 
-export default Column;
+export default CaptureForm;

@@ -1,4 +1,4 @@
-const metadataForms = [
+const metadataData = [
   {
     label: "Protocol",
     id: "protocol",
@@ -37,4 +37,4 @@ const metadataForms = [
   }
 ];
 
-export default metadataForms;
+export default metadataData;

@@ -11,6 +11,8 @@ import pathlib
 import pandas as pd
 import numpy as np
 from queue import Queue
+import asyncio
+import json
 
 from fastapi import FastAPI, Request, Form, Response, HTTPException, Body
 from fastapi.templating import Jinja2Templates
@@ -26,12 +28,16 @@ from ast import literal_eval
 
 from inspection_utils.view_rec import view_rec
 from recording_curation.npy_slicer import npy_slicer
-from recording_curation.signal_inspector import signal_folder_inspector_npy2, load_numpy2
+from recording_curation.signal_inspector import (
+    signal_folder_inspector_npy2,
+    load_numpy2,
+)
 from recording_curation.get_html import get_index_html, get_curate, generate_draft_html
 from inspection_utils.dataset_review import dataset_review
 from recording_curation.gui_curator_reset import clear_directories
 import sdr as sdr
 from sdr.sdr_capture import sdr_module, get_attached_radios
+
 print("running from sdr repo as submodule")
 
 os.makedirs("static/", exist_ok=True)
@@ -40,7 +46,6 @@ app = FastAPI()
 
 origins = [
     "http://localhost:3000",  # React app address
-    # add more origins if needed
 ]
 
 app.add_middleware(
@@ -51,27 +56,27 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-templates = Jinja2Templates(directory="templates") # HTML TEMPLATES HERE
+templates = Jinja2Templates(directory="templates")  # HTML TEMPLATES HERE
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # get radios installed on this system
-passes=get_attached_radios()
-use_sdr=passes[0]
+passes = get_attached_radios()
+use_sdr = passes[0]
 
 default_values = {
-    'ip_address': '192.168.40.2',
-    'num_samples': 10000000,
-    'center_frequency': 2440000000,
-    'gain': 32,
-    'channel': 0,
-    'sample_rate': 40000000,
-    'protocol': "Wifi-BGN",
-    'use_case': "ambient",
-    'testbed': "Portable-Blade",
-    'transmitters': "Ambient",
-    'project_name': "Collision2023",
-    'sdr': f"{use_sdr}",
-    'passes':f"{passes}"
+    "ip_address": "192.168.40.2",
+    "num_samples": 10000000,
+    "center_frequency": 2440000000,
+    "gain": 32,
+    "channel": 0,
+    "sample_rate": 40000000,
+    "protocol": "Wifi-BGN",
+    "use_case": "ambient",
+    "testbed": "Portable-Blade",
+    "transmitters": "Ambient",
+    "project_name": "Collision2023",
+    "sdr": f"{use_sdr}",
+    "passes": f"{passes}",
 }
 
 result_store = {}
@@ -89,12 +94,15 @@ class RecArgs(BaseModel):
     stream_time: int
     zmq: int
 
+
 @app.get("/")
 def read_root():
-    return RedirectResponse(url='http://localhost:3000/')
+    return RedirectResponse(url="http://localhost:3000/")
+
 
 @app.post("/")
-async def create_home(request: Request,
+async def create_home(
+    request: Request,
     protocol: str = Form(...),
     use_case: str = Form(...),
     testbed: str = Form(...),
@@ -106,8 +114,8 @@ async def create_home(request: Request,
     center_frequency: str = Form(...),
     sample_rate: str = Form(...),
     gain: str = Form(...),
-    channel: str = Form(...)
-    ):
+    channel: str = Form(...),
+):
     # Convert string fields to the correct type
     num_samples = int(num_samples)
     center_frequency = float(center_frequency)
@@ -146,30 +154,30 @@ async def create_home(request: Request,
     :return: A template response rendering the result with the capture metadata and image.
     :rtype: templates.TemplateResponse
     """
-    
+
     metadata = {
-        'metadata': {
-            'protocol': protocol,
-            'use_case': use_case,
-            'testbed': testbed,
-            'transmitters': transmitters,
-            'project_name': project_name,
-            'sdr': sdr
+        "metadata": {
+            "protocol": protocol,
+            "use_case": use_case,
+            "testbed": testbed,
+            "transmitters": transmitters,
+            "project_name": project_name,
+            "sdr": sdr,
         }
     }
 
-    use_sdr=sdr
+    use_sdr = sdr
 
     metafile = "logiq_meta.yaml"
-    metapath = pathlib.Path("sdr/"+metafile)
-    metapath2 = pathlib.Path("sdr/modules/"+metafile)
+    metapath = pathlib.Path("sdr/" + metafile)
+    metapath2 = pathlib.Path("sdr/modules/" + metafile)
 
     # Writing data to YAML file
-    with open(metapath, 'w') as file:
-        yaml.dump(metadata, file,  sort_keys=False, default_flow_style=False)
+    with open(metapath, "w") as file:
+        yaml.dump(metadata, file, sort_keys=False, default_flow_style=False)
     shutil.copy(metapath, metapath2)
 
-    #copy so sdr repo knows... #TODO: correct this - it is not appropriately callign the yaml template in sdr/modules
+    # copy so sdr repo knows... #TODO: correct this - it is not appropriately callign the yaml template in sdr/modules
 
     # Construct args object
     rec_args = RecArgs(
@@ -183,32 +191,35 @@ async def create_home(request: Request,
         sdr=use_sdr,
         stream_time=0,
         zmq=5555,
-        metadata=metafile
+        metadata=metafile,
     )
 
     # capture from SDR
     os.makedirs("slice_review", exist_ok=True)
     os.makedirs("example_review", exist_ok=True)
 
-    fullpath,_ = sdr_module(rec_args)
+    fullpath, _ = sdr_module(rec_args)
     print(f"capture {use_sdr}  and saved to {fullpath}")
 
-    view_args = Namespace(
-        plottime="full",
-        saveplot=True,
-        filename=fullpath
-    )
+    view_args = Namespace(plottime="full", saveplot=True, filename=fullpath)
 
     print(view_args.filename)
     image_filename = view_rec(view_args)
-    image_url = request.url_for('static', path=image_filename)
+    image_url = request.url_for("static", path=image_filename)
     print("hello")
     print(image_url)
 
-    return {"image_url": image_url, "filename": fullpath}
+    rec_dict = rec_args.dict()
+    view_dict = vars(view_args)
+
+    return {
+        "image_url": image_url,
+        "rec_args": view_dict,
+        "capture_args": rec_dict,
+        "metadata": metadata,
+    }
+
     # image_filename = view_rec(view_args)
-    # rec_dict = rec_args.dict()
-    # view_dict = view_args
     # return templates.TemplateResponse('result.html', {"request": request, 'image_filename': image_filename, 'view_args': view_dict, 'rec_args': rec_dict, 'metadata': metadata["metadata"]})
 
 
@@ -225,9 +236,15 @@ def namespace_to_dict(namespace):
 
 
 @app.post("/result")
-async def result(request: Request, action: str = Form(...), cuts: str = Form(None), protocol: str = Form(None),
-                filename: str = Form(None), num_samples: float = Form(None), 
-                sample_rate: float = Form(None)):
+async def result(
+    request: Request,
+    action: str = Form(...),
+    cuts: str = Form(None),
+    protocol: str = Form(None),
+    filename: str = Form(None),
+    num_samples: float = Form(None),
+    sample_rate: float = Form(None),
+):
     """
     Process the action ('discard' or 'save') on the form submission and perform corresponding operations.
 
@@ -249,59 +266,65 @@ async def result(request: Request, action: str = Form(...), cuts: str = Form(Non
     :rtype: Response or dict
     """
 
-    if action == 'discard':
+    if action == "discard":
         # Delete files and redirect to index.html
-        print("skipping discarding image, will overwrite.")
+        print("Skipping discarding image, will overwrite.")
         if os.path.isfile(filename):
             os.remove(filename)
-        # Redirect to index.html
-        return Response(content=get_index_html(**default_values), media_type="text/html")
+            print("Capture deleted")
+        return Response("Capture deleted")
 
-    elif action == 'save':
+    elif action == "save":
         if cuts and protocol and filename and num_samples and sample_rate:
-                cuts_clean = str(cuts.replace(',', ' ').replace('\n', ' ').replace('\r', ' '))
-                cuts_list = cuts_clean.split()
-                cuts_list.sort()
-                duration_ms = (num_samples/sample_rate)*1000
-                cuts_list = [int(num_samples*int(i)/duration_ms) for i in cuts_list if i.isdigit()]
+            cuts_clean = str(
+                cuts.replace(",", " ").replace("\n", " ").replace("\r", " ")
+            )
+            cuts_list = cuts_clean.split()
+            cuts_list.sort()
+            duration_ms = (num_samples / sample_rate) * 1000
+            cuts_list = [
+                int(num_samples * int(i) / duration_ms)
+                for i in cuts_list
+                if i.isdigit()
+            ]
 
-                cuts_args = Namespace(
-                    source_signal_file=filename,
-                    target_folder=f"./slice_review/{protocol}/",
-                    cuts=cuts_list
-                )
+            cuts_args = Namespace(
+                source_signal_file=filename,
+                target_folder=f"./slice_review/{protocol}/",
+                cuts=cuts_list,
+            )
 
-                slice_dir = pathlib.Path.cwd() / 'slice_review' / protocol
-                static_dir = pathlib.Path.cwd() / 'static' / protocol
+            slice_dir = pathlib.Path.cwd() / 'slice_review' / protocol
+            static_dir = pathlib.Path.cwd() / 'static' / protocol
 
-                old_slice_files = [f for dp, dn, filenames in os.walk(slice_dir) for f in filenames if pathlib.Path(f).suffix in ['.npy']]
+            old_slice_files = [f for dp, dn, filenames in os.walk(slice_dir) for f in filenames if pathlib.Path(f).suffix in ['.npy']]
 
-                npy_slicer(cuts_args)
+            npy_slicer(cuts_args)
 
-                backup_folder = "../rec_backups/"
-                os.makedirs(backup_folder, exist_ok=True)
-                shutil.copy(filename, backup_folder)
+            backup_folder = "../rec_backups/"
+            os.makedirs(backup_folder, exist_ok=True)
+            shutil.copy(filename, backup_folder)
 
-                try:
-                    os.remove("./static/signal.svg")
-                except Exception as e:
-                    print("An error occurred:", e)
+            try:
+                os.remove("./static/signal.svg")
+            except Exception as e:
+                print("An error occurred:", e)
 
 
-                html_filename = signal_folder_inspector_npy2(f"./slice_review/","collect")
-                new_slice_files = [f for dp, dn, filenames in os.walk(slice_dir) for f in filenames if pathlib.Path(f).suffix in ['.npy']]
-                newly_created_files = list(set(new_slice_files) - set(old_slice_files))
-                all_files = [str(pathlib.Path(dp).relative_to(pathlib.Path.cwd() / 'static') / f) for dp, dn, filenames in os.walk(static_dir) for f in filenames if pathlib.Path(f).suffix in ['.svg'] and pathlib.Path(f).stem in [pathlib.Path(sf).stem for sf in newly_created_files]]
+            html_filename = signal_folder_inspector_npy2(f"./slice_review/","collect")
+            new_slice_files = [f for dp, dn, filenames in os.walk(slice_dir) for f in filenames if pathlib.Path(f).suffix in ['.npy']]
+            newly_created_files = list(set(new_slice_files) - set(old_slice_files))
+            all_files = [str(pathlib.Path(dp).relative_to(pathlib.Path.cwd() / 'static') / f) for dp, dn, filenames in os.walk(static_dir) for f in filenames if pathlib.Path(f).suffix in ['.svg'] and pathlib.Path(f).stem in [pathlib.Path(sf).stem for sf in newly_created_files]]
         
-                image_urls = [str(request.url_for('static', path=f)) for f in all_files]
+            image_urls = [str(request.url_for('static', path=f)) for f in all_files]
 
-                print(image_urls)
-                print(all_files)
+            print(image_urls)
+            print(all_files)
 
-                result = {"files": all_files, "image_urls": image_urls}
-                result_store['result'] = result
+            result = {"files": all_files, "image_urls": image_urls}
+            result_store['result'] = result
         
-                return result
+            return result
 
         else:
             return {"error": "Required form data missing"}
@@ -314,6 +337,7 @@ async def get_result():
 
 class Files(BaseModel):
     selectedFiles: List[str]
+
 
 @app.post("/collect")
 async def collect(files: Files):
@@ -331,48 +355,63 @@ async def collect(files: Files):
     selectedFiles = files.selectedFiles
     global state
 
-    if 'state' not in globals():
+    if "state" not in globals():
         state = "collect"
 
     print(f"Selected files: {selectedFiles}")  # print selected files to console
 
-
     if state == "review":
-        for file in selectedFiles: 
-            original_files_folder = './example_review/'+file.split('/')[0]  # Update this to the path to the original .npy files
+        for file in selectedFiles:
+            original_files_folder = (
+                "./example_review/" + file.split("/")[0]
+            )  # Update this to the path to the original .npy files
             destination = "./included/"
             pathlib.Path(destination).mkdir(parents=True, exist_ok=True)
-            npyfile = file.split("/")[-1].split(".")[-2]+".npy"
+            npyfile = file.split("/")[-1].split(".")[-2] + ".npy"
             try:
                 shutil.copy(f"{original_files_folder}/{npyfile}", destination)
 
             except Exception as e:
-                print(f"Error: {e}")  
-                raise HTTPException(status_code=400, detail={'error': f'An error occurred while processing file: {file}.', 'details': str(e)})
+                print(f"Error: {e}")
+                raise HTTPException(
+                    status_code=400,
+                    detail={
+                        "error": f"An error occurred while processing file: {file}.",
+                        "details": str(e),
+                    },
+                )
 
         shutil.rmtree(original_files_folder.split("/")[1])
         shutil.rmtree(f"./static/")
 
-
     else:
-        original_files_folder = './slice_review/'+selectedFiles[0].split('/')[0]  # Update this to the path to the original .npy files
-        destination = "./example_review/"+selectedFiles[0].split('/')[0]
+        original_files_folder = (
+            "./slice_review/" + selectedFiles[0].split("/")[0]
+        )  # Update this to the path to the original .npy files
+        destination = "./example_review/" + selectedFiles[0].split("/")[0]
         pathlib.Path(destination).mkdir(exist_ok=True)
 
-        for file in selectedFiles: 
-            npyfile = file.split("/")[-1].split(".")[-2]+".npy"
+        for file in selectedFiles:
+            npyfile = file.split("/")[-1].split(".")[-2] + ".npy"
             try:
                 shutil.copy(f"{original_files_folder}/{npyfile}", destination)
 
             except Exception as e:
-                print(f"Error: {e}")  
-                raise HTTPException(status_code=400, detail={'error': f'An error occurred while processing file: {file}.', 'details': str(e)})
+                print(f"Error: {e}")
+                raise HTTPException(
+                    status_code=400,
+                    detail={
+                        "error": f"An error occurred while processing file: {file}.",
+                        "details": str(e),
+                    },
+                )
 
         shutil.rmtree(original_files_folder)
         shutil.rmtree(f"./static/{selectedFiles[0].split('/')[0]}")
     pathlib.Path("./static").mkdir(parents=True, exist_ok=True)
     state = None
-    return {'message': 'Files and corresponding numpy files added successfully!'}
+    return {"message": "Files and corresponding numpy files added successfully!"}
+
 
 @app.get("/review")
 @app.post("/review")
@@ -390,14 +429,21 @@ async def review(request: Request):
     print("include then review")
 
     # Assume signal_folder_inspector_npy2 is defined elsewhere or imported
-    signal_folder_inspector_npy2(f"./example_review/", "review") 
+    signal_folder_inspector_npy2(f"./example_review/", "review")
 
-    all_files = [os.path.join(dp, f) for dp, dn, filenames in os.walk('example_review') 
-                 for f in filenames if os.path.splitext(f)[1] in ['.png', '.svg']]
+    all_files = [
+        os.path.join(dp, f)
+        for dp, dn, filenames in os.walk("example_review")
+        for f in filenames
+        if os.path.splitext(f)[1] in [".png", ".svg"]
+    ]
     global state
-    state = "review" 
+    state = "review"
 
-    return templates.TemplateResponse('inspect_final.html', {"request": request, "recordings": all_files})
+    return templates.TemplateResponse(
+        "inspect_final.html", {"request": request, "recordings": all_files}
+    )
+
 
 @app.get("/curate")
 async def curate(request: Request):
@@ -418,6 +464,7 @@ async def curate(request: Request):
 
     return Response(content=get_curate(recordingsummary), media_type="text/html")
 
+
 def load_recordingsummary(folderpath: str):
     """
     Load metadata from `.npy` files in a directory into a DataFrame.
@@ -428,28 +475,43 @@ def load_recordingsummary(folderpath: str):
     :type folderpath: str
     :return: A DataFrame containing metadata from the `.npy` files.
     :rtype: pd.DataFrame
-    """ 
+    """
     recordingsummary = pd.DataFrame()
 
     # Loop over all files in the directory
     for filename in os.listdir(folderpath):
-        if filename.endswith(".npy"): 
+        if filename.endswith(".npy"):
             filepath = os.path.join(folderpath, filename)
-            
+
             # Load data from the file
-            _, extended_metaf = load_numpy2(filepath)        
+            _, extended_metaf = load_numpy2(filepath)
             new_row = pd.DataFrame(extended_metaf, index=[0])
             # Add filename in the DataFrame
-            new_row['filename'] = filename
+            new_row["filename"] = filename
             # Append the new row to the summary DataFrame
             recordingsummary = pd.concat([recordingsummary, new_row], ignore_index=True)
 
     try:
-        recordingsummary = recordingsummary.loc[:,["center_freq","sample_rate","date_recorded","time_recorded","protocol","use_case","testbed","project_name","filename","sdr"]]
+        recordingsummary = recordingsummary.loc[
+            :,
+            [
+                "center_freq",
+                "sample_rate",
+                "date_recorded",
+                "time_recorded",
+                "protocol",
+                "use_case",
+                "testbed",
+                "project_name",
+                "filename",
+                "sdr",
+            ],
+        ]
     except:
         print("not reducing pd size")
 
     return recordingsummary
+
 
 def enqueue_output(out, queue):
     """
@@ -462,11 +524,12 @@ def enqueue_output(out, queue):
     :param queue: The queue to which read lines are added.
     :type queue: Queue
     """
-    for line in iter(out.readline, b''):
+    for line in iter(out.readline, b""):
         queue.put(line)
     out.close()
 
-def run_curate(curate_args,action):
+
+def run_curate(curate_args, action):
     """
     Execute the curation process with specified arguments and action.
 
@@ -480,34 +543,60 @@ def run_curate(curate_args,action):
     :rtype: list[str]
     """
     if action == "final":
-        command = ['python3', './recording_curation/curator/curator.py', "-sdf", curate_args.target_dataset_file, "-t", curate_args.target_dataset_file] 
+        command = [
+            "python3",
+            "./recording_curation/curator/curator.py",
+            "-sdf",
+            curate_args.target_dataset_file,
+            "-t",
+            curate_args.target_dataset_file,
+        ]
 
         try:
-            command.extend(["-i",str(curate_args.homogenize)])
+            command.extend(["-i", str(curate_args.homogenize)])
         except Exception:
             print("no subsampling needed.")
 
         try:
-            command.extend(["-a",str(curate_args.augment_and_fill)])
+            command.extend(["-a", str(curate_args.augment_and_fill)])
         except Exception:
             print("no augmentation to be added.")
 
-        if hasattr(curate_args, 'drop_classes') and curate_args.drop_classes is not None:
+        if (
+            hasattr(curate_args, "drop_classes")
+            and curate_args.drop_classes is not None
+        ):
             if len(curate_args.drop_classes):
                 command.append("-l")
                 command.extend(curate_args.drop_classes)
         else:
             print("no classes to be dropped.")
 
-
     else:
-        command = ['python3', './recording_curation/curator/curator.py', "-r", "./included/", "-t", curate_args.target_dataset_file, "-e", curate_args.example_length, "-j", curate_args.keys[0], curate_args.keys[1]]  
-    if sys.platform.startswith('win'): # handling in case running on windows
-        command[0] = 'python'
+        command = [
+            "python3",
+            "./recording_curation/curator/curator.py",
+            "-r",
+            "./included/",
+            "-t",
+            curate_args.target_dataset_file,
+            "-e",
+            curate_args.example_length,
+            "-j",
+            curate_args.keys[0],
+            curate_args.keys[1],
+        ]
+    if sys.platform.startswith("win"):  # handling in case running on windows
+        command[0] = "python"
 
     print(command)
 
-    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
+    process = subprocess.Popen(
+        command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        universal_newlines=True,
+    )
     output_lines = []  # Variable to store the output lines
     while True:
         line = process.stdout.readline()
@@ -519,8 +608,18 @@ def run_curate(curate_args,action):
     process.wait()  # Wait for the script to complete before closing the SSE connection
     return output_lines[-100:]
 
+
 class CurateArgs:
-    def __init__(self, example_length: str, keys: List[str], target_dataset_file: str, num_classes: int, homogenize: Optional[int] = 0, augment_and_fill: Optional[int] = 0, drop_classes: Optional[List[str]] = None):
+    def __init__(
+        self,
+        example_length: str,
+        keys: List[str],
+        target_dataset_file: str,
+        num_classes: int,
+        homogenize: Optional[int] = 0,
+        augment_and_fill: Optional[int] = 0,
+        drop_classes: Optional[List[str]] = None,
+    ):
         self.example_length = example_length
         self.keys = keys
         self.target_dataset_file = target_dataset_file
@@ -529,17 +628,20 @@ class CurateArgs:
         self.augment_and_fill = augment_and_fill
         self.drop_classes = drop_classes
 
+
 @app.post("/folder2dataset", response_class=HTMLResponse)
-async def draft_dataset(request: Request,
-                        action: str = Form(...),
-                        example_length: str = Form(...),
-                        class_1: str = Form(...),
-                        class_2: str = Form(...),
-                        dataset_name: str = Form(...),
-                        num_classes: int = Form(2),
-                        homogenize: Optional[str] = Form(None),
-                        augment: Optional[str] = Form(None),
-                        drop_classes: Union[List[str], str] = Form(None)):
+async def draft_dataset(
+    request: Request,
+    action: str = Form(...),
+    example_length: str = Form(...),
+    class_1: str = Form(...),
+    class_2: str = Form(...),
+    dataset_name: str = Form(...),
+    num_classes: int = Form(2),
+    homogenize: Optional[str] = Form(None),
+    augment: Optional[str] = Form(None),
+    drop_classes: Union[List[str], str] = Form(None),
+):
     """
     Process form submission to draft or finalize a dataset based on input parameters.
 
@@ -574,13 +676,25 @@ async def draft_dataset(request: Request,
     form_data = await request.form()
     print(f"Form: {form_data}")
 
-    curate_args = CurateArgs(example_length, [class_1, class_2], dataset_name, num_classes, homogenize, augment, drop_classes)
+    curate_args = CurateArgs(
+        example_length,
+        [class_1, class_2],
+        dataset_name,
+        num_classes,
+        homogenize,
+        augment,
+        drop_classes,
+    )
     review_args = Namespace(source_dataset_file=dataset_name)
 
     if action == "final":
-        curate_args.homogenize = int(homogenize) if homogenize and homogenize.isdigit() else 0
-        curate_args.augment_and_fill = int(augment) if augment and augment.isdigit() else 0
-        curate_args.drop_classes = form_data.getlist('drop_classes')
+        curate_args.homogenize = (
+            int(homogenize) if homogenize and homogenize.isdigit() else 0
+        )
+        curate_args.augment_and_fill = (
+            int(augment) if augment and augment.isdigit() else 0
+        )
+        curate_args.drop_classes = form_data.getlist("drop_classes")
 
         print(f"Homogenize to: {curate_args.homogenize}")
         print(f"Augment to: {curate_args.augment_and_fill}")
@@ -591,6 +705,7 @@ async def draft_dataset(request: Request,
 
     html_string = generate_draft_html(review_args, curate_args, action, terminal_output)
     return HTMLResponse(content=html_string)
+
 
 @app.get("/download")
 async def download(dataset_file: str):
@@ -609,9 +724,16 @@ async def download(dataset_file: str):
     filename = os.path.basename(dataset_file)
     file_path = os.path.join(directory_path, filename)
     if os.path.exists(file_path) and os.access(file_path, os.R_OK):
-        return FileResponse(file_path, filename=filename, headers={"Content-Disposition": f"attachment; filename={filename}"})
+        return FileResponse(
+            file_path,
+            filename=filename,
+            headers={"Content-Disposition": f"attachment; filename={filename}"},
+        )
     else:
-        raise HTTPException(status_code=404, detail="File not found or no permission to read.")
+        raise HTTPException(
+            status_code=404, detail="File not found or no permission to read."
+        )
+
 
 @app.post("/reset")
 async def reset():
@@ -623,12 +745,19 @@ async def reset():
     :return: A redirect response to the home page.
     :rtype: RedirectResponse
     """
-    directories = ['./static', './example_review', './included', './recordings', './slice_review']
+    directories = [
+        "./static",
+        "./example_review",
+        "./included",
+        "./recordings",
+        "./slice_review",
+    ]
     clear_directories(directories)
     print(f"Reset and cleared directories {directories}")
-    return RedirectResponse(url='/', status_code=HTTP_302_FOUND)
+    return RedirectResponse(url="/", status_code=HTTP_302_FOUND)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     uvicorn.run(app, host="localhost", port=8000)
 
 ### TODO's

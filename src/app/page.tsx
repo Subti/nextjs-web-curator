@@ -1,8 +1,10 @@
+"use client";
+
 import React from "react";
-import Column from "./components/Column"; // Importing Column component
 import Header from "./components/Header"; // Importing Header component
-import captureSettingsForms from "./modules/captureSettingsForms"; // Importing captureSettingsForms module
-import metadataForms from "./modules/metadataForms"; // Importing metadataForms module
+import captureSettingsData from "./modules/captureSettingsData"; // Importing captureSettingsData module
+import metadataData from "./modules/metadataData"; // Importing metadataData module
+import CaptureForm from "./components/CaptureForm";
 
 /**
  * Home Component
@@ -12,15 +14,15 @@ import metadataForms from "./modules/metadataForms"; // Importing metadataForms 
  * and a button.
  */
 export default function Home() {
-  const allForms = [...captureSettingsForms, ...metadataForms];
+  const allForms = [...captureSettingsData, ...metadataData];
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
       {/* Rendering Header component */}
-      <Header />
+      <Header title="Capture recording from software defined radio" />
       <div className="flex flex-grow bg-white w-1/2">
         {/* Rendering Column component with all forms */}
-        <Column title="Capture Settings & Metadata" forms={allForms} />
+        <CaptureForm title="Capture Settings & Metadata" forms={allForms} />
       </div>
     </div>
   );
