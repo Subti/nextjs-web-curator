@@ -6,12 +6,12 @@ import React from "react";
  * Represents the select signal header section of the application.
  * Displays a title centered within a colored background.
  */
-const SelectSignalHeader = () => {
+const ResultHeader = () => {
   return (
-    <div className="text-4xl text-white flex relative w-4/5 h-32 bg-[#2298dc] justify-center items-center mb-4">
+    <div className="text-4xl text-white flex relative w-4/5 h-32 bg-[#2298dc] justify-center items-center mb-4 rounded-2xl">
       Select Signals to Include in Training Dataset:
     </div>
   );
 };
 
-export default SelectSignalHeader; // Exporting Header component
+export default ResultHeader; // Exporting Header component
