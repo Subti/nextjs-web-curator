@@ -189,6 +189,9 @@ const DisplayImage: React.FC = () => {
 
     const data = await response.json();
     console.log(data);
+
+    // Redirect to the sliced-images page
+    router.push('/sliced-images');
   };
 
   return (
