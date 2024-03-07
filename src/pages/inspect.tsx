@@ -37,6 +37,7 @@ export default function Inspect(props: any) {
     fetch("http://localhost:8000/formvalues")
       .then((response) => response.json())
       .then((data) => {
+        console.log(data)
         setProtocol(data.protocol);
         setNumSamples(data.num_samples);
         setSampleRate(data.sample_rate);
@@ -203,18 +204,19 @@ export default function Inspect(props: any) {
     const formData = new FormData();
     formData.append('action', 'save');
     formData.append('cuts', cutPoints);
+    console.log(cutPoints);
+    console.log(protocol)
+    console.log(filename)
+    console.log(numSamples)
+    console.log(sampleRate)
     if (typeof protocol === 'string') {
       formData.append('protocol', protocol);
     }
     if (typeof filename === 'string') {
       formData.append('filename', filename);
     }
-    if (typeof numSamples === 'string') {
-      formData.append('num_samples', numSamples);
-    }
-    if (typeof sampleRate === 'string') {
-      formData.append('sample_rate', sampleRate);
-    }
+    formData.append('num_samples', numSamples.toString());
+    formData.append('sample_rate', sampleRate.toString());
 
     try {
       const response = await fetch('http://localhost:8000/result', {
@@ -229,6 +231,8 @@ export default function Inspect(props: any) {
       // Optionally, process response data here
       const data = await response.json();
       console.log(data);
+
+      router.push('/sliced-images');
 
       // Redirect to the sliced-images page only after the fetch request is successfully completed
     } catch (error) {
@@ -394,20 +398,7 @@ export default function Inspect(props: any) {
       </div>
       {/* Submit button */}
       <Button text="Discard and Capture New" onClick={discardAndCaptureNew} />
-      <button
-        style={{
-          marginTop: '20px',
-          padding: '10px',
-          backgroundColor: 'blue',
-          color: 'white',
-          border: 'none',
-          borderRadius: '5px',
-          cursor: 'pointer'
-        }}
-        onClick={handleSubmit}
-      >
-        Submit
-      </button>
+      <Button text="Submit" onClick={handleSubmit} />
     </div>
   );
 

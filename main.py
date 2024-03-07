@@ -218,7 +218,7 @@ async def create_home(
               'project_name': project_name, 'sdr': sdr, 'ip_address': ip_address,
               'num_samples': num_samples, 'center_frequency': center_frequency,
               'sample_rate': sample_rate, 'gain': gain, 'channel': channel,
-              'image_url': image_url, 'rec_args': rec_dict, 'capture_args': view_dict, 'metadata': metadata}
+              'image_url': image_url, 'rec_args': rec_dict, 'capture_args': view_dict, 'metadata': metadata, 'filename': fullpath}
     
     formvalues_store['formvalues'] = result
 
@@ -278,6 +278,12 @@ async def result(request: Request, action: str = Form(...), cuts: str = Form(Non
         return Response("Capture deleted")
 
     elif action == 'save':
+        print("Saving capture")
+        print(cuts)
+        print(protocol)
+        print(filename)
+        print(num_samples)
+        print(sample_rate)
         if cuts and protocol and filename and num_samples and sample_rate:
                 cuts_clean = str(cuts.replace(',', ' ').replace('\n', ' ').replace('\r', ' '))
                 cuts_list = cuts_clean.split()
