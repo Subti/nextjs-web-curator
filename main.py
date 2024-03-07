@@ -227,7 +227,7 @@ async def create_home(
     # image_filename = view_rec(view_args)
     # return templates.TemplateResponse('result.html', {"request": request, 'image_filename': image_filename, 'view_args': view_dict, 'rec_args': rec_dict, 'metadata': metadata["metadata"]})
 
-@app.get("/result")
+@app.get("/formvalues")
 async def get_result():
     return formvalues_store.get('formvalues', {})
 
@@ -245,15 +245,9 @@ def namespace_to_dict(namespace):
 
 
 @app.post("/result")
-async def result(
-    request: Request,
-    action: str = Form(...),
-    cuts: str = Form(None),
-    protocol: str = Form(None),
-    filename: str = Form(None),
-    num_samples: float = Form(None),
-    sample_rate: float = Form(None),
-):
+async def result(request: Request, action: str = Form(...), cuts: str = Form(None), protocol: str = Form(None),
+                filename: str = Form(None), num_samples: float = Form(None), 
+                sample_rate: float = Form(None)):
     """
     Process the action ('discard' or 'save') on the form submission and perform corresponding operations.
 
@@ -283,64 +277,58 @@ async def result(
             print("Capture deleted")
         return Response("Capture deleted")
 
-    elif action == "save":
+    elif action == 'save':
         if cuts and protocol and filename and num_samples and sample_rate:
-            cuts_clean = str(
-                cuts.replace(",", " ").replace("\n", " ").replace("\r", " ")
-            )
-            cuts_list = cuts_clean.split()
-            cuts_list.sort()
-            duration_ms = (num_samples / sample_rate) * 1000
-            cuts_list = [
-                int(num_samples * int(i) / duration_ms)
-                for i in cuts_list
-                if i.isdigit()
-            ]
+                cuts_clean = str(cuts.replace(',', ' ').replace('\n', ' ').replace('\r', ' '))
+                cuts_list = cuts_clean.split()
+                cuts_list.sort()
+                duration_ms = (num_samples/sample_rate)*1000
+                cuts_list = [int(num_samples*int(i)/duration_ms) for i in cuts_list if i.isdigit()]
 
-            cuts_args = Namespace(
-                source_signal_file=filename,
-                target_folder=f"./slice_review/{protocol}/",
-                cuts=cuts_list,
-            )
+                cuts_args = Namespace(
+                    source_signal_file=filename,
+                    target_folder=f"./slice_review/{protocol}/",
+                    cuts=cuts_list
+                )
 
-            slice_dir = pathlib.Path.cwd() / 'slice_review' / protocol
-            static_dir = pathlib.Path.cwd() / 'static' / protocol
+                slice_dir = pathlib.Path.cwd() / 'slice_review' / protocol
+                static_dir = pathlib.Path.cwd() / 'static' / protocol
 
-            old_slice_files = [f for dp, dn, filenames in os.walk(slice_dir) for f in filenames if pathlib.Path(f).suffix in ['.npy']]
+                old_slice_files = [f for dp, dn, filenames in os.walk(slice_dir) for f in filenames if pathlib.Path(f).suffix in ['.npy']]
 
-            npy_slicer(cuts_args)
+                npy_slicer(cuts_args)
 
-            backup_folder = "../rec_backups/"
-            os.makedirs(backup_folder, exist_ok=True)
-            shutil.copy(filename, backup_folder)
+                backup_folder = "../rec_backups/"
+                os.makedirs(backup_folder, exist_ok=True)
+                shutil.copy(filename, backup_folder)
 
-            try:
-                os.remove("./static/signal.svg")
-            except Exception as e:
-                print("An error occurred:", e)
+                try:
+                    os.remove("./static/signal.svg")
+                except Exception as e:
+                    print("An error occurred:", e)
 
 
-            html_filename = signal_folder_inspector_npy2(f"./slice_review/","collect")
-            new_slice_files = [f for dp, dn, filenames in os.walk(slice_dir) for f in filenames if pathlib.Path(f).suffix in ['.npy']]
-            newly_created_files = list(set(new_slice_files) - set(old_slice_files))
-            all_files = [str(pathlib.Path(dp).relative_to(pathlib.Path.cwd() / 'static') / f) for dp, dn, filenames in os.walk(static_dir) for f in filenames if pathlib.Path(f).suffix in ['.svg'] and pathlib.Path(f).stem in [pathlib.Path(sf).stem for sf in newly_created_files]]
+                html_filename = signal_folder_inspector_npy2(f"./slice_review/","collect")
+                new_slice_files = [f for dp, dn, filenames in os.walk(slice_dir) for f in filenames if pathlib.Path(f).suffix in ['.npy']]
+                newly_created_files = list(set(new_slice_files) - set(old_slice_files))
+                all_files = [str(pathlib.Path(dp).relative_to(pathlib.Path.cwd() / 'static') / f) for dp, dn, filenames in os.walk(static_dir) for f in filenames if pathlib.Path(f).suffix in ['.svg'] and pathlib.Path(f).stem in [pathlib.Path(sf).stem for sf in newly_created_files]]
         
-            image_urls = [str(request.url_for('static', path=f)) for f in all_files]
+                image_urls = [str(request.url_for('static', path=f)) for f in all_files]
 
-            print(image_urls)
-            print(all_files)
+                print(image_urls)
+                print(all_files)
 
-            result = {"files": all_files, "image_urls": image_urls}
-            result_store['result'] = result
+                result = {"files": all_files, "image_urls": image_urls}
+                result_store['result'] = result
         
-            return result
+                return result
 
         else:
             return {"error": "Required form data missing"}
 
     return "Invalid request"
 
-@app.get("/cuts")
+@app.get("/result")
 async def get_result():
     return result_store.get('result', {})
 

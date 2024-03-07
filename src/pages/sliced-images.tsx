@@ -10,7 +10,7 @@ const SlicedImages = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:8000/cuts')
+    fetch('http://localhost:8000/result')
       .then(response => response.json())
       .then((data: Data) => {
         setData(data);
@@ -28,7 +28,7 @@ const SlicedImages = () => {
 
   return (
     <div>
-      {data && data.image_urls.map((url, index) => (
+      {data && data.image_urls && data.image_urls.map((url, index) => (
         <img key={index} src={url} alt={`Sliced Image ${index}`} />
       ))}
     </div>

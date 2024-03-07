@@ -34,7 +34,7 @@ export default function Inspect(props: any) {
 
   // Fetch data on component mount
   useEffect(() => {
-    fetch("http://localhost:8000/result")
+    fetch("http://localhost:8000/formvalues")
       .then((response) => response.json())
       .then((data) => {
         setProtocol(data.protocol);
@@ -197,6 +197,7 @@ export default function Inspect(props: any) {
 
   const handleSubmit = async () => {
     if (!currentDivBounds) return;
+
     const cutPoints = convertToCutPoints(rectangles, currentDivBounds.width, Number(numSamples)).join(' ');
 
     const formData = new FormData();
@@ -215,16 +216,24 @@ export default function Inspect(props: any) {
       formData.append('sample_rate', sampleRate);
     }
 
-    const response = await fetch('http://localhost:8000/result', {
-      method: 'POST',
-      body: formData,
-    });
+    try {
+      const response = await fetch('http://localhost:8000/result', {
+        method: 'POST',
+        body: formData,
+      });
 
-    const data = await response.json();
-    console.log(data);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
 
-    // Redirect to the sliced-images page
-    router.push('/sliced-images');
+      // Optionally, process response data here
+      const data = await response.json();
+      console.log(data);
+
+      // Redirect to the sliced-images page only after the fetch request is successfully completed
+    } catch (error) {
+      console.error('There has been a problem with your fetch operation:', error);
+    }
   };
 
   let recordingSummary = decodeURIComponent(router.query.rec_summary as string);
@@ -232,9 +241,6 @@ export default function Inspect(props: any) {
     router.query.capture_settings as string
   );
   let metadata = decodeURIComponent(router.query.metadata as string);
-
-  console.log(metaData)
-  console.log(metadata)
 
   const discardAndCaptureNew = async () => {
     router.push("/");
@@ -297,7 +303,7 @@ export default function Inspect(props: any) {
           src={imageUrl}
           alt="Generated"
           onLoad={handleImageLoad}
-          style={{ transform: 'scale(1)', transformOrigin: 'top left' }} // Adjust as necessary
+          style={{ transformOrigin: 'top left' }} // Adjust as necessary
         />
         {/* Rectangles rendering */}
         {currentDivBounds && rectangles.map((rect, i) => {
