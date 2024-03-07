@@ -276,7 +276,6 @@ export default function Inspect(props: any) {
     <div className="flex flex-col items-center">
       <Header title="Inspect Recording" />
       <div className="flex justify-between custom-width-90-percent">
-        {/* Displaying recording summary, capture settings, and metadata */}
         <ReviewSettings
           title="Recording Summary:"
           renderFormAndButton={false}
@@ -294,7 +293,6 @@ export default function Inspect(props: any) {
         />
       </div>
 
-      {/* Image and interactive drawing functionality */}
       <div
         id="mainDiv"
         onMouseDown={handleMouseDown}
@@ -321,7 +319,6 @@ export default function Inspect(props: any) {
           }
           return (
             <React.Fragment key={i}>
-              {/* Start line */}
               <div
                 style={{
                   borderLeft: '2px dashed black',
@@ -331,7 +328,6 @@ export default function Inspect(props: any) {
                   height: `${currentDivBounds.height / 2.45}px`,
                 }}
               />
-              {/* Cut point */}
               {cutPoint && (
                 <div
                   style={{
@@ -346,7 +342,6 @@ export default function Inspect(props: any) {
                   {`Start: ${cutPoint.split(' ')[0]}, End: ${cutPoint.split(' ')[1]}`}
                 </div>
               )}
-              {/* End line */}
               <div
                 style={{
                   borderLeft: '2px dashed black',
@@ -356,7 +351,6 @@ export default function Inspect(props: any) {
                   height: `${currentDivBounds.height / 2.45}px`,
                 }}
               />
-              {/* Rectangle */}
               <div
                 style={{
                   border: '1px solid red',
@@ -367,7 +361,6 @@ export default function Inspect(props: any) {
                   height: `${rect.height}px`,
                 }}
               >
-                {/* Delete and Deselect buttons for selected rectangle */}
                 {i === selectedRectangleIndex && (
                   <>
                     <button style={{ position: 'absolute', right: 0, top: 0 }} onClick={() => handleDelete(i)}>
@@ -382,7 +375,6 @@ export default function Inspect(props: any) {
             </React.Fragment>
           );
         })}
-        {/* Current rectangle being drawn */}
         {currentRect && (
           <div
             style={{
@@ -396,7 +388,6 @@ export default function Inspect(props: any) {
           />
         )}
       </div>
-      {/* Submit button */}
       <Button text="Discard and Capture New" onClick={discardAndCaptureNew} />
       <Button text="Submit" onClick={handleSubmit} />
     </div>
