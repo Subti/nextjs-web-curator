@@ -10,7 +10,7 @@ const SlicedImages = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:8000/result')
+    fetch('http://localhost:8000/cuts')
       .then(response => response.json())
       .then((data: Data) => {
         setData(data);

@@ -79,6 +79,7 @@ default_values = {
     "passes": f"{passes}",
 }
 
+formvalues_store = {}
 result_store = {}
 
 class RecArgs(BaseModel):
@@ -212,15 +213,23 @@ async def create_home(
     rec_dict = rec_args.dict()
     view_dict = vars(view_args)
 
-    return {
-        "image_url": image_url,
-        "rec_args": view_dict,
-        "capture_args": rec_dict,
-        "metadata": metadata,
-    }
+    result = {'protocol': protocol, 'use_case': use_case, 
+              'testbed': testbed, 'transmitters': transmitters,
+              'project_name': project_name, 'sdr': sdr, 'ip_address': ip_address,
+              'num_samples': num_samples, 'center_frequency': center_frequency,
+              'sample_rate': sample_rate, 'gain': gain, 'channel': channel,
+              'image_url': image_url, 'rec_args': rec_dict, 'capture_args': view_dict, 'metadata': metadata}
+    
+    formvalues_store['formvalues'] = result
+
+    return result
 
     # image_filename = view_rec(view_args)
     # return templates.TemplateResponse('result.html', {"request": request, 'image_filename': image_filename, 'view_args': view_dict, 'rec_args': rec_dict, 'metadata': metadata["metadata"]})
+
+@app.get("/result")
+async def get_result():
+    return formvalues_store.get('formvalues', {})
 
 
 def namespace_to_dict(namespace):
@@ -331,7 +340,7 @@ async def result(
 
     return "Invalid request"
 
-@app.get("/result")
+@app.get("/cuts")
 async def get_result():
     return result_store.get('result', {})
 

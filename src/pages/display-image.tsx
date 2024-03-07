@@ -8,11 +8,20 @@ interface Rectangle {
   height: number;
 }
 
-const DisplayImage: React.FC = () => {
+interface DisplayImageProps {
+  protocol: string;
+  numSamples: number;
+  sampleRate: number;
+  filename: string;
+  imageUrl: string;
+}
+
+const DisplayImage: React.FC<DisplayImageProps> = ({ protocol, numSamples, sampleRate, filename, imageUrl }) => {
   const [rectangles, setRectangles] = useState<Rectangle[]>([]);
   const [currentRect, setCurrentRect] = useState<Rectangle | null>(null);
   const [startPoint, setStartPoint] = useState<{ x: number; y: number } | null>(null);
   const [imageBounds, setImageBounds] = useState<DOMRect | null>(null);
+  const [currentDivBounds, setCurrentDivBounds] = useState<DOMRect | null>(null);
   const [selectedRectangleIndex, setSelectedRectangleIndex] = useState<number | null>(null);
   const [cutPoints, setCutPoints] = useState<string[]>([]);
 
@@ -20,34 +29,36 @@ const DisplayImage: React.FC = () => {
   const imageRef = useRef<HTMLImageElement | null>(null);
 
   const router = useRouter();
-  const protocol = router.query.protocol;
-  const num_samples = router.query.num_samples;
-  const sample_rate = router.query.sample_rate;
-  const filename = router.query.filename;
-  const imageUrl = decodeURIComponent(router.query.image_url as string);
 
   useEffect(() => {
     if (imageRef.current) {
-      setImageBounds(imageRef.current.getBoundingClientRect());
+      const mainDiv = document.getElementById('mainDiv');
+      setCurrentDivBounds(mainDiv?.getBoundingClientRect() ?? null);
     }
   }, [imageRef.current]);
 
   const handleImageLoad = () => {
     if (imageRef.current) {
-      setImageBounds(imageRef.current.getBoundingClientRect());
+      const mainDiv = document.getElementById('mainDiv');
+      setCurrentDivBounds(mainDiv?.getBoundingClientRect() ?? null);
     }
-  };
+  }
 
   const handleMouseDown = (e: MouseEvent) => {
-    if (!imageBounds || selectedRectangleIndex !== null) return; // Prevent drawing new boxes when a box is selected
-    const x = e.clientX - imageBounds.left;
-    const y = e.clientY - imageBounds.top;
+    if (selectedRectangleIndex !== null) return; // Prevent drawing new boxes when a box is selected
+    const mainDiv = document.getElementById('mainDiv');
+    if (!mainDiv) return;
+    const mainDivBounds = mainDiv.getBoundingClientRect();
 
-    const minImageWidth = imageBounds.width * 0.125; // Constrict bounding box to % of image width (start point)
-    const maxImageWidth = imageBounds.width * 0.899; // Constrict bounding box to % of image width (end point)
+    // Use mainDivBounds instead of imageBounds to calculate the positions
+    const x = e.clientX - mainDivBounds.left;
+    const y = e.clientY - mainDivBounds.top;
 
-    const minImageHeight = imageBounds.height * 0.465; // Constrict bounding box to % of image height (start point)
-    const maxImageHeight = imageBounds.height * 0.877; // Constrict bounding box to % of image height (end point)
+    const minImageWidth = mainDivBounds.width * 0.125; // Constrict bounding box to % of image width (start point)
+    const maxImageWidth = mainDivBounds.width * 0.899; // Constrict bounding box to % of image width (end point)
+
+    const minImageHeight = mainDivBounds.height * 0.465; // Constrict bounding box to % of image height (start point)
+    const maxImageHeight = mainDivBounds.height * 0.877; // Constrict bounding box to % of image height (end point)
 
     if (x < minImageWidth || x > maxImageWidth || y < minImageHeight || y > maxImageHeight) return;
 
@@ -67,16 +78,21 @@ const DisplayImage: React.FC = () => {
   };
 
   const handleMouseMove = (e: MouseEvent) => {
-    if (!currentRect || !startPoint || !imageBounds) return;
+    if (!currentRect || !startPoint) return;
+    const mainDiv = document.getElementById('mainDiv');
+    if (!mainDiv || !currentRect || !startPoint) return;
+    const mainDivBounds = mainDiv.getBoundingClientRect();
+
+    // Use mainDivBounds instead of imageBounds to calculate the positions
     requestAnimationFrame(() => {
-      let width = e.clientX - startPoint.x - imageBounds.left;
-      let height = e.clientY - startPoint.y - imageBounds.top;
+      let width = e.clientX - startPoint.x - mainDivBounds.left;
+      let height = e.clientY - startPoint.y - mainDivBounds.top;
 
-      const minImageWidth = imageBounds.width * 0.125; // Cosntrict drawing to % of image width (start point)
-      const maxImageWidth = imageBounds.width * 0.899; // Constrict drawing to % of image width (end point)
+      const minImageWidth = mainDivBounds.width * 0.125; // Cosntrict drawing to % of image width (start point)
+      const maxImageWidth = mainDivBounds.width * 0.899; // Constrict drawing to % of image width (end point)
 
-      const minImageHeight = imageBounds.height * 0.465; // Constrict drawing to % of image height (start point)
-      const maxImageHeight = imageBounds.height * 0.877; // Constrict drawing to % of image height (end point)
+      const minImageHeight = mainDivBounds.height * 0.465; // Constrict drawing to % of image height (start point)
+      const maxImageHeight = mainDivBounds.height * 0.877; // Constrict drawing to % of image height (end point)
 
       if (startPoint.x + width < minImageWidth) {
         width = minImageWidth - startPoint.x;
@@ -100,7 +116,7 @@ const DisplayImage: React.FC = () => {
   };
 
   const handleMouseUp = () => {
-    if (!currentRect || !imageBounds) return;
+    if (!currentRect || !currentDivBounds) return;
 
     // Check if the new rectangle would overlap with any existing rectangles
     const wouldOverlap = rectangles.some(
@@ -124,7 +140,7 @@ const DisplayImage: React.FC = () => {
     setStartPoint(null);
 
     // Calculate cutPoints immediately after a rectangle is drawn
-    const newCutPoints = convertToCutPoints(newRectangles, imageBounds.width, Number(num_samples));
+    const newCutPoints = convertToCutPoints(newRectangles, currentDivBounds.width, Number(numSamples));
     setCutPoints(newCutPoints);
     console.log(newCutPoints);
   };
@@ -150,7 +166,7 @@ const DisplayImage: React.FC = () => {
 
   const calculateCutPointPosition = (rectangle: Rectangle, cutPoint: string, imageWidth: number) => {
     const [start, end] = cutPoint.split(' ').map(Number);
-    const maxTime = (Number(num_samples) / 10000000) * 500; // Calculate the maximum time based on the num_samples
+    const maxTime = (Number(numSamples) / 10000000) * 500; // Calculate the maximum time based on the num_samples
 
     const minImageWidth = imageWidth * 0.125; // Start of the constricted part
     const maxImageWidth = imageWidth * 0.899; // End of the constricted part
@@ -163,8 +179,8 @@ const DisplayImage: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    if (!imageBounds) return;
-    const cutPoints = convertToCutPoints(rectangles, imageBounds.width, Number(num_samples)).join(' ');
+    if (!currentDivBounds) return;
+    const cutPoints = convertToCutPoints(rectangles, currentDivBounds.width, Number(numSamples)).join(' ');
 
     const formData = new FormData();
     formData.append('action', 'save');
@@ -175,11 +191,11 @@ const DisplayImage: React.FC = () => {
     if (typeof filename === 'string') {
       formData.append('filename', filename);
     }
-    if (typeof num_samples === 'string') {
-      formData.append('num_samples', num_samples);
+    if (typeof numSamples === 'string') {
+      formData.append('num_samples', numSamples);
     }
-    if (typeof sample_rate === 'string') {
-      formData.append('sample_rate', sample_rate);
+    if (typeof sampleRate === 'string') {
+      formData.append('sample_rate', sampleRate);
     }
 
     const response = await fetch('http://localhost:8000/result', {
@@ -195,8 +211,9 @@ const DisplayImage: React.FC = () => {
   };
 
   return (
+    console.log(imageUrl),
     <div
-      style={{ position: 'relative' }}
+      id="bounding-boxes"
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
@@ -205,15 +222,15 @@ const DisplayImage: React.FC = () => {
         ref={imageRef}
         src={imageUrl}
         alt="Generated"
-        style={{ position: 'absolute', transform: 'scale(1)', transformOrigin: 'top left' }} // Test scaling here by changing the scale number to whatever you want
+        style={{ transform: 'scale(1)', transformOrigin: 'top left' }} // Test scaling here by changing the scale number to whatever you want
         onLoad={handleImageLoad}
       />
-      {imageBounds && rectangles.map((rect, i) => {
+      {currentDivBounds && rectangles.map((rect, i) => {
         const cutPoint = cutPoints[i];
         let start = 0;
         let end = 0;
         if (cutPoint) {
-          const positions = calculateCutPointPosition(rect, cutPoint, imageBounds.width);
+          const positions = calculateCutPointPosition(rect, cutPoint, currentDivBounds.width);
           start = positions.start;
           end = positions.end;
         }
@@ -223,10 +240,9 @@ const DisplayImage: React.FC = () => {
               key={`line-start-${i}`}
               style={{
                 borderLeft: '2px dashed black',
-                position: 'absolute',
                 left: `${rect.x}px`,
-                top: `${imageBounds.height / 20}px`,
-                height: `${imageBounds.height / 2.45}px`,
+                top: `${currentDivBounds.height / 20}px`,
+                height: `${currentDivBounds.height / 2.45}px`,
               }}
             />
             {cutPoint && (
@@ -235,9 +251,9 @@ const DisplayImage: React.FC = () => {
                 style={{
                   position: 'absolute',
                   left: `${start}px`,
-                  top: `${imageBounds.height / 20}px`,
+                  top: `${currentDivBounds.height / 20}px`,
                   width: `${end - start}px`,
-                  height: `${imageBounds.height / 2.45}px`,
+                  height: `${currentDivBounds.height / 2.45}px`,
                   backgroundColor: 'rgba(255, 0, 0, 0.5)', // Change this to whatever you want
                 }}
               >
@@ -250,8 +266,8 @@ const DisplayImage: React.FC = () => {
                 borderLeft: '2px dashed black',
                 position: 'absolute',
                 left: `${rect.x + rect.width}px`,
-                top: `${imageBounds.height / 20}px`,
-                height: `${imageBounds.height / 2.45}px`,
+                top: `${currentDivBounds.height / 20}px`,
+                height: `${currentDivBounds.height / 2.45}px`,
               }}
             />
             <div
