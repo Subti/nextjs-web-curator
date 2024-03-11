@@ -6,7 +6,7 @@ import Button from "./Button";
 interface ReviewSettingProps {
   title: string;
   renderFormAndButton: boolean;
-  formData: string | null;
+  formData: Record<string, any> | null;
 }
 
 export default function ReviewSetting({
@@ -38,8 +38,7 @@ export default function ReviewSetting({
   useEffect(() => {
     if (formData) {
       const timeout = setTimeout(() => {
-        const formObj = JSON.parse(formData);
-        setData(transformKeys(formObj));
+        setData(transformKeys(formData));
         console.log("Setting Displayed");
       }, 100);
 

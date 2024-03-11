@@ -218,7 +218,7 @@ async def create_home(
               'project_name': project_name, 'sdr': sdr, 'ip_address': ip_address,
               'num_samples': num_samples, 'center_frequency': center_frequency,
               'sample_rate': sample_rate, 'gain': gain, 'channel': channel,
-              'image_url': image_url, 'rec_args': rec_dict, 'capture_args': view_dict, 'metadata': metadata, 'filename': fullpath}
+              'image_url': image_url, 'rec_args': view_dict, 'capture_args': rec_dict, 'metadata': metadata, 'filename': fullpath}
     
     formvalues_store['formvalues'] = result
 

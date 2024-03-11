@@ -20,7 +20,9 @@ export default function Inspect(props: any) {
   const [sampleRate, setSampleRate] = useState(0);
   const [filename, setFilename] = useState("");
   const [imageUrl, setImageUrl] = useState("");
-  const [metaData, setMetaData] = useState("");
+  const [metaData, setMetaData] = useState({});
+  const [captureSettings, setCaptureSettings] = useState({});
+  const [recordingSummary, setRecordingSummary] = useState({});
 
   // States from the DisplayImage component
   const [rectangles, setRectangles] = useState<Rectangle[]>([]);
@@ -44,6 +46,8 @@ export default function Inspect(props: any) {
         setFilename(data.filename);
         setImageUrl(data.image_url._url);
         setMetaData(data.metadata.metadata);
+        setCaptureSettings(data.capture_args);
+        setRecordingSummary(data.rec_args);
       })
       .catch((error) => console.error("Error:", error));
   }, []);
@@ -240,20 +244,12 @@ export default function Inspect(props: any) {
     }
   };
 
-  let recordingSummary = decodeURIComponent(router.query.rec_summary as string);
-  let captureSettings = decodeURIComponent(
-    router.query.capture_settings as string
-  );
-  let metadata = decodeURIComponent(router.query.metadata as string);
-
   const discardAndCaptureNew = async () => {
     router.push("/");
 
-    recordingSummary = JSON.parse(recordingSummary);
-
     const formData = new FormData();
     formData.append("action", "discard");
-    formData.append("filename", `${(recordingSummary as any).filename}`);
+    formData.append("filename", `${filename}`);
 
     try {
       const response = await fetch("http://localhost:8000/result", {
@@ -279,17 +275,17 @@ export default function Inspect(props: any) {
         <ReviewSettings
           title="Recording Summary:"
           renderFormAndButton={false}
-          formData={decodeURIComponent(router.query.rec_summary as string)}
+          formData={recordingSummary}
         />
         <ReviewSettings
           title="SDR Capture Settings:"
           renderFormAndButton={false}
-          formData={decodeURIComponent(router.query.capture_settings as string)}
+          formData={captureSettings}
         />
         <ReviewSettings
           title="Metadata:"
           renderFormAndButton={false}
-          formData={decodeURIComponent(router.query.metadata as string)}
+          formData={metaData}
         />
       </div>
 
