@@ -73,29 +73,14 @@ const CaptureForm: React.FC<CaptureFormProps> = ({ title, forms }) => {
         console.error("HTTP error", response.status);
       } else {
         const data = await response.json();
-        setRecordingSummary(data.rec_args);
-        setCaptureSettings(data.capture_args);
-        setMetadata(data.metadata.metadata);
-        setImageUrl(data.image_url._url);
+        if (data) {
+          router.push("/inspect");
+        }
       }
     } catch (error) {
       console.error("Error:", error);
     }
   };
-
-  useEffect(() => {
-    if (imageUrl && recordingSummary && captureSettings && metadata) {
-      router.push(
-        `/inspect?image_url=${encodeURIComponent(
-          imageUrl
-        )}&rec_summary=${encodeURIComponent(
-          JSON.stringify(recordingSummary)
-        )}&capture_settings=${encodeURIComponent(
-          JSON.stringify(captureSettings)
-        )}&metadata=${encodeURIComponent(JSON.stringify(metadata))}`
-      );
-    }
-  }, [imageUrl, recordingSummary, captureSettings, metadata, router]);
 
   return (
     <form
