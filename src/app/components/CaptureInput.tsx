@@ -24,10 +24,12 @@ const CaptureInput: React.FC<CaptureInputProps> = (props) => {
   return (
     <>
       {/* Rendering label for the CaptureInput field */}
-      <label className="font-bold text-[18px] mb-2">{props.label}:</label>
+      <label className="font-bold text-[18px] mb-2 text-white">
+        {props.label}:
+      </label>
       {/* Input field */}
       <input
-        className="mb-2 py-2 mb-8 custom-border-input"
+        className="mb-2 py-2 mb-8 bg-[#222] text-white border-[1px] border-[#625F63] rounded-lg focus:border-[#E63462]"
         type="text"
         id={props.id}
         name={props.id}
