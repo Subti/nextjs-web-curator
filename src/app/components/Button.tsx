@@ -12,7 +12,7 @@ import React from "react";
 const Button = (props: any) => {
   return (
     <button
-      className="text-xl text-white rounded-full px-7 py-3 bg-gradient-to-r from-[#2298dc] to-[#7a64a7] self-center"
+      className="text-xl text-white rounded-lg px-7 py-3 bg-transparent border-2 border-white transition-colors duration-500 hover:bg-[#03A9F4] self-center"
       type={props.type}
       onClick={props.onClick}
     >
