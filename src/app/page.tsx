@@ -17,10 +17,10 @@ export default function Home() {
   const allForms = [...captureSettingsData, ...metadataData];
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
+    <div className="flex flex-col items-center justify-center min-h-screen text-[#625F63]">
       {/* Rendering Header component */}
       <Header title="Capture recording from software defined radio" />
-      <div className="flex flex-grow bg-white w-1/2">
+      <div className="flex flex-grow w-1/2">
         {/* Rendering Column component with all forms */}
         <CaptureForm title="Capture Settings & Metadata" forms={allForms} />
       </div>
