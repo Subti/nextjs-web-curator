@@ -95,7 +95,7 @@ const CaptureForm: React.FC<CaptureFormProps> = ({ title, forms }) => {
           onChange={(value: string) => handleFormChange(formData.id, value)}
         />
       ))}
-      <Button text="Submit" type="submit" />
+      <Button text="Submit" type="submit" textSize="xl" />
     </form>
   );
 };
