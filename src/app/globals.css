@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+  background-color: #1c1c1c;
+}
+
 .custom-border-input {
   border: none;
   border-bottom: 1px solid #333; /* Set bottom border */
@@ -9,7 +13,7 @@
 }
 
 .custom-border-input:focus {
-  border-bottom-color: #108a5b; /* Change bottom border color on focus */
+  border-bottom-color: #03a9f4; /* Change bottom border color on focus */
   border-bottom-width: 2px;
 }
 
