@@ -1,24 +1,40 @@
-"use client";
-
 import React from "react";
 
-/**
- * Button Component
- *
- * Represents a button element with a click event handler.
- * Displays a "Submit" button with a gradient background.
- * Alerts "Hello World!" when clicked.
- */
-const Button = (props: any) => {
+// Define TextSize interface
+interface TextSize {
+  sm: string;
+  md: string;
+  base: string;
+  lg: string;
+  xl: string;
+}
+
+// Define ButtonProps interface
+interface ButtonProps {
+  textSize: keyof TextSize;
+  type: "submit" | "reset" | "button" | undefined;
+  text: string;
+}
+
+const Button = (props: ButtonProps) => {
+  const textSize: TextSize = {
+    sm: "text-sm",
+    md: "text-md",
+    base: "text-base",
+    lg: "text-lg",
+    xl: "text-xl"
+  };
+
   return (
     <button
-      className={`text-${props.textSize} text-white rounded-lg px-7 py-3 bg-transparent border-[1px] border-white transition-colors duration-500 hover:bg-[#03A9F4] self-center`}
+      className={`${
+        textSize[props.textSize]
+      } text-white rounded-lg px-7 py-3 bg-transparent border-[1px] border-white transition-colors duration-500 hover:bg-[#03A9F4] self-center`}
       type={props.type}
-      onClick={props.onClick}
     >
       {props.text}
     </button>
   );
 };
 
-export default Button; // Exporting Button component
+export default Button;
