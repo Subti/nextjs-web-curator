@@ -27,9 +27,15 @@ export default function Inspect(props: any) {
   // States from the DisplayImage component
   const [rectangles, setRectangles] = useState<Rectangle[]>([]);
   const [currentRect, setCurrentRect] = useState<Rectangle | null>(null);
-  const [startPoint, setStartPoint] = useState<{ x: number; y: number } | null>(null);
-  const [currentDivBounds, setCurrentDivBounds] = useState<DOMRect | null>(null);
-  const [selectedRectangleIndex, setSelectedRectangleIndex] = useState<number | null>(null);
+  const [startPoint, setStartPoint] = useState<{ x: number; y: number } | null>(
+    null
+  );
+  const [currentDivBounds, setCurrentDivBounds] = useState<DOMRect | null>(
+    null
+  );
+  const [selectedRectangleIndex, setSelectedRectangleIndex] = useState<
+    number | null
+  >(null);
   const [cutPoints, setCutPoints] = useState<string[]>([]);
 
   const imageRef = useRef<HTMLImageElement | null>(null);
@@ -39,7 +45,7 @@ export default function Inspect(props: any) {
     fetch("http://localhost:8000/formvalues")
       .then((response) => response.json())
       .then((data) => {
-        console.log(data)
+        console.log(data);
         setProtocol(data.protocol);
         setNumSamples(data.num_samples);
         setSampleRate(data.sample_rate);
@@ -68,7 +74,7 @@ export default function Inspect(props: any) {
 
   const handleMouseDown = (e: MouseEvent) => {
     if (selectedRectangleIndex !== null) return; // Prevent drawing new boxes when a box is selected
-    const mainDiv = document.getElementById('mainDiv');
+    const mainDiv = document.getElementById("mainDiv");
     if (!mainDiv) return;
     const mainDivBounds = mainDiv.getBoundingClientRect();
 
@@ -82,10 +88,16 @@ export default function Inspect(props: any) {
     const minImageHeight = mainDivBounds.height * 0.465; // Constrict bounding box to % of image height (start point)
     const maxImageHeight = mainDivBounds.height * 0.877; // Constrict bounding box to % of image height (end point)
 
-    if (x < minImageWidth || x > maxImageWidth || y < minImageHeight || y > maxImageHeight) return;
+    if (
+      x < minImageWidth ||
+      x > maxImageWidth ||
+      y < minImageHeight ||
+      y > maxImageHeight
+    )
+      return;
 
     const clickedRectangleIndex = rectangles.findIndex(
-      rect =>
+      (rect) =>
         x >= rect.x &&
         x <= rect.x + rect.width &&
         y >= rect.y &&
@@ -101,7 +113,7 @@ export default function Inspect(props: any) {
 
   const handleMouseMove = (e: MouseEvent) => {
     if (!currentRect || !startPoint) return;
-    const mainDiv = document.getElementById('mainDiv');
+    const mainDiv = document.getElementById("mainDiv");
     if (!mainDiv || !currentRect || !startPoint) return;
     const mainDivBounds = mainDiv.getBoundingClientRect();
 
@@ -132,7 +144,7 @@ export default function Inspect(props: any) {
         x: width > 0 ? startPoint.x : startPoint.x + width,
         y: height > 0 ? startPoint.y : startPoint.y + height,
         width: Math.abs(width),
-        height: Math.abs(height),
+        height: Math.abs(height)
       });
     });
   };
@@ -142,7 +154,7 @@ export default function Inspect(props: any) {
 
     // Check if the new rectangle would overlap with any existing rectangles
     const wouldOverlap = rectangles.some(
-      rect =>
+      (rect) =>
         currentRect.x < rect.x + rect.width &&
         currentRect.x + currentRect.width > rect.x &&
         currentRect.y < rect.y + rect.height &&
@@ -150,19 +162,26 @@ export default function Inspect(props: any) {
     );
     if (wouldOverlap) {
       // If the new rectangle would overlap, show an alert and don't add it
-      alert('You cannot overlap the bounding boxes.');
+      alert("You cannot overlap the bounding boxes.");
       setCurrentRect(null);
       setStartPoint(null);
       return;
     }
 
-    const newRectangles = [...rectangles, { ...currentRect, id: Date.now().toString() }];
+    const newRectangles = [
+      ...rectangles,
+      { ...currentRect, id: Date.now().toString() }
+    ];
     setRectangles(newRectangles);
     setCurrentRect(null);
     setStartPoint(null);
 
     // Calculate cutPoints immediately after a rectangle is drawn
-    const newCutPoints = convertToCutPoints(newRectangles, currentDivBounds.width, Number(numSamples));
+    const newCutPoints = convertToCutPoints(
+      newRectangles,
+      currentDivBounds.width,
+      Number(numSamples)
+    );
     setCutPoints(newCutPoints);
     console.log(newCutPoints);
   };
@@ -172,30 +191,42 @@ export default function Inspect(props: any) {
     setSelectedRectangleIndex(null);
   };
 
-  const convertToCutPoints = (rectangles: Rectangle[], imageWidth: number, numSamples: number) => {
+  const convertToCutPoints = (
+    rectangles: Rectangle[],
+    imageWidth: number,
+    numSamples: number
+  ) => {
     const maxTime = (numSamples / 10000000) * 500; // Calculate the maximum time based on the num_samples
 
     const minImageWidth = imageWidth * 0.125; // Start of the constricted part
     const maxImageWidth = imageWidth * 0.899; // End of the constricted part
     const constrictedWidth = maxImageWidth - minImageWidth; // Width of the constricted part
 
-    return rectangles.map(rect => {
-      const start = Math.round(((rect.x - minImageWidth) / constrictedWidth) * maxTime);
-      const end = Math.round((((rect.x + rect.width) - minImageWidth) / constrictedWidth) * maxTime);
+    return rectangles.map((rect) => {
+      const start = Math.round(
+        ((rect.x - minImageWidth) / constrictedWidth) * maxTime
+      );
+      const end = Math.round(
+        ((rect.x + rect.width - minImageWidth) / constrictedWidth) * maxTime
+      );
       return `${start} ${end}`;
     });
   };
 
-  const calculateCutPointPosition = (rectangle: Rectangle, cutPoint: string, imageWidth: number) => {
-    const [start, end] = cutPoint.split(' ').map(Number);
+  const calculateCutPointPosition = (
+    rectangle: Rectangle,
+    cutPoint: string,
+    imageWidth: number
+  ) => {
+    const [start, end] = cutPoint.split(" ").map(Number);
     const maxTime = (Number(numSamples) / 10000000) * 500; // Calculate the maximum time based on the num_samples
 
     const minImageWidth = imageWidth * 0.125; // Start of the constricted part
     const maxImageWidth = imageWidth * 0.899; // End of the constricted part
     const constrictedWidth = maxImageWidth - minImageWidth; // Width of the constricted part
 
-    const startPosition = ((start / maxTime) * constrictedWidth) + minImageWidth;
-    const endPosition = ((end / maxTime) * constrictedWidth) + minImageWidth;
+    const startPosition = (start / maxTime) * constrictedWidth + minImageWidth;
+    const endPosition = (end / maxTime) * constrictedWidth + minImageWidth;
 
     return { start: startPosition, end: endPosition };
   };
@@ -203,44 +234,51 @@ export default function Inspect(props: any) {
   const handleSubmit = async () => {
     if (!currentDivBounds) return;
 
-    const cutPoints = convertToCutPoints(rectangles, currentDivBounds.width, Number(numSamples)).join(' ');
+    const cutPoints = convertToCutPoints(
+      rectangles,
+      currentDivBounds.width,
+      Number(numSamples)
+    ).join(" ");
 
     const formData = new FormData();
-    formData.append('action', 'save');
-    formData.append('cuts', cutPoints);
+    formData.append("action", "save");
+    formData.append("cuts", cutPoints);
     console.log(cutPoints);
-    console.log(protocol)
-    console.log(filename)
-    console.log(numSamples)
-    console.log(sampleRate)
-    if (typeof protocol === 'string') {
-      formData.append('protocol', protocol);
+    console.log(protocol);
+    console.log(filename);
+    console.log(numSamples);
+    console.log(sampleRate);
+    if (typeof protocol === "string") {
+      formData.append("protocol", protocol);
     }
-    if (typeof filename === 'string') {
-      formData.append('filename', filename);
+    if (typeof filename === "string") {
+      formData.append("filename", filename);
     }
-    formData.append('num_samples', numSamples.toString());
-    formData.append('sample_rate', sampleRate.toString());
+    formData.append("num_samples", numSamples.toString());
+    formData.append("sample_rate", sampleRate.toString());
 
     try {
-      const response = await fetch('http://localhost:8000/result', {
-        method: 'POST',
-        body: formData,
+      const response = await fetch("http://localhost:8000/result", {
+        method: "POST",
+        body: formData
       });
 
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error("Network response was not ok");
       }
 
       // Optionally, process response data here
       const data = await response.json();
       console.log(data);
 
-      router.push('/sliced-images');
+      router.push("/sliced-images");
 
       // Redirect to the sliced-images page only after the fetch request is successfully completed
     } catch (error) {
-      console.error('There has been a problem with your fetch operation:', error);
+      console.error(
+        "There has been a problem with your fetch operation:",
+        error
+      );
     }
   };
 
@@ -270,7 +308,6 @@ export default function Inspect(props: any) {
 
   return (
     <div className="flex flex-col items-center">
-      <Header title="Inspect Recording" />
       <div className="flex justify-between custom-width-90-percent">
         <ReviewSettings
           title="Recording Summary:"
@@ -294,99 +331,121 @@ export default function Inspect(props: any) {
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
-        style={{ position: 'relative' }} // Ensure relative positioning for child absolute elements
+        style={{ position: "relative" }} // Ensure relative positioning for child absolute elements
       >
         <img
           ref={imageRef}
           src={imageUrl}
           alt="Generated"
           onLoad={handleImageLoad}
-          style={{ transformOrigin: 'top left' }} // Adjust as necessary
+          style={{ transformOrigin: "top left" }} // Adjust as necessary
         />
         {/* Rectangles rendering */}
-        {currentDivBounds && rectangles.map((rect, i) => {
-          const cutPoint = cutPoints[i];
-          let start = 0;
-          let end = 0;
-          if (cutPoint) {
-            const positions = calculateCutPointPosition(rect, cutPoint, currentDivBounds.width);
-            start = positions.start;
-            end = positions.end;
-          }
-          return (
-            <React.Fragment key={i}>
-              <div
-                style={{
-                  borderLeft: '2px dashed black',
-                  position: 'absolute',
-                  left: `${rect.x}px`,
-                  top: `${currentDivBounds.height / 20}px`,
-                  height: `${currentDivBounds.height / 2.45}px`,
-                }}
-              />
-              {cutPoint && (
+        {currentDivBounds &&
+          rectangles.map((rect, i) => {
+            const cutPoint = cutPoints[i];
+            let start = 0;
+            let end = 0;
+            if (cutPoint) {
+              const positions = calculateCutPointPosition(
+                rect,
+                cutPoint,
+                currentDivBounds.width
+              );
+              start = positions.start;
+              end = positions.end;
+            }
+            return (
+              <React.Fragment key={i}>
                 <div
                   style={{
-                    position: 'absolute',
-                    left: `${start}px`,
+                    borderLeft: "2px dashed black",
+                    position: "absolute",
+                    left: `${rect.x}px`,
                     top: `${currentDivBounds.height / 20}px`,
-                    width: `${end - start}px`,
-                    height: `${currentDivBounds.height / 2.45}px`,
-                    backgroundColor: 'rgba(255, 0, 0, 0.5)',
+                    height: `${currentDivBounds.height / 2.45}px`
+                  }}
+                />
+                {cutPoint && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      left: `${start}px`,
+                      top: `${currentDivBounds.height / 20}px`,
+                      width: `${end - start}px`,
+                      height: `${currentDivBounds.height / 2.45}px`,
+                      backgroundColor: "rgba(255, 0, 0, 0.5)"
+                    }}
+                  >
+                    {`Start: ${cutPoint.split(" ")[0]}, End: ${
+                      cutPoint.split(" ")[1]
+                    }`}
+                  </div>
+                )}
+                <div
+                  style={{
+                    borderLeft: "2px dashed black",
+                    position: "absolute",
+                    left: `${rect.x + rect.width}px`,
+                    top: `${currentDivBounds.height / 20}px`,
+                    height: `${currentDivBounds.height / 2.45}px`
+                  }}
+                />
+                <div
+                  style={{
+                    border: "1px solid red",
+                    position: "absolute",
+                    left: `${rect.x}px`,
+                    top: `${rect.y}px`,
+                    width: `${rect.width}px`,
+                    height: `${rect.height}px`
                   }}
                 >
-                  {`Start: ${cutPoint.split(' ')[0]}, End: ${cutPoint.split(' ')[1]}`}
+                  {i === selectedRectangleIndex && (
+                    <>
+                      <button
+                        style={{ position: "absolute", right: 0, top: 0 }}
+                        onClick={() => handleDelete(i)}
+                      >
+                        Delete
+                      </button>
+                      <button
+                        style={{ position: "absolute", right: 0, bottom: 0 }}
+                        onClick={() => setSelectedRectangleIndex(null)}
+                      >
+                        Deselect
+                      </button>
+                    </>
+                  )}
                 </div>
-              )}
-              <div
-                style={{
-                  borderLeft: '2px dashed black',
-                  position: 'absolute',
-                  left: `${rect.x + rect.width}px`,
-                  top: `${currentDivBounds.height / 20}px`,
-                  height: `${currentDivBounds.height / 2.45}px`,
-                }}
-              />
-              <div
-                style={{
-                  border: '1px solid red',
-                  position: 'absolute',
-                  left: `${rect.x}px`,
-                  top: `${rect.y}px`,
-                  width: `${rect.width}px`,
-                  height: `${rect.height}px`,
-                }}
-              >
-                {i === selectedRectangleIndex && (
-                  <>
-                    <button style={{ position: 'absolute', right: 0, top: 0 }} onClick={() => handleDelete(i)}>
-                      Delete
-                    </button>
-                    <button style={{ position: 'absolute', right: 0, bottom: 0 }} onClick={() => setSelectedRectangleIndex(null)}>
-                      Deselect
-                    </button>
-                  </>
-                )}
-              </div>
-            </React.Fragment>
-          );
-        })}
+              </React.Fragment>
+            );
+          })}
         {currentRect && (
           <div
             style={{
-              border: '1px solid red',
-              position: 'absolute',
+              border: "1px solid red",
+              position: "absolute",
               left: `${currentRect.x}px`,
               top: `${currentRect.y}px`,
               width: `${currentRect.width}px`,
-              height: `${currentRect.height}px`,
+              height: `${currentRect.height}px`
             }}
           />
         )}
       </div>
-      <Button text="Discard and Capture New" onClick={discardAndCaptureNew} />
-      <Button text="Submit" onClick={handleSubmit} />
+      <Button
+        text="Discard and Capture New"
+        type="button"
+        textSize="base"
+        onClick={discardAndCaptureNew}
+      />
+      <Button
+        text="Submit"
+        type="button"
+        textSize="base"
+        onClick={handleSubmit}
+      />
     </div>
   );
-
 }
