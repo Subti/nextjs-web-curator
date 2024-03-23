@@ -19,7 +19,6 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen text-[#625F63]">
       {/* Rendering Header component */}
-      <Header title="Capture recording from software defined radio" />
       <div className="flex flex-grow w-1/2">
         {/* Rendering Column component with all forms */}
         <CaptureForm title="Capture Settings & Metadata" forms={allForms} />
