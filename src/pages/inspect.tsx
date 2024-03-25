@@ -308,19 +308,20 @@ export default function Inspect(props: any) {
 
   return (
     <div className="flex flex-col items-center">
-      <div className="flex justify-between custom-width-90-percent">
+      <Header />
+      <div className="flex justify-between custom-width-90-percent mb-5">
         <ReviewSettings
-          title="Recording Summary:"
+          title="Recording Summary"
           renderFormAndButton={false}
           formData={recordingSummary}
         />
         <ReviewSettings
-          title="SDR Capture Settings:"
+          title="SDR Capture Settings"
           renderFormAndButton={false}
           formData={captureSettings}
         />
         <ReviewSettings
-          title="Metadata:"
+          title="Metadata"
           renderFormAndButton={false}
           formData={metaData}
         />
@@ -434,18 +435,20 @@ export default function Inspect(props: any) {
           />
         )}
       </div>
-      <Button
-        text="Discard and Capture New"
-        type="button"
-        textSize="base"
-        onClick={discardAndCaptureNew}
-      />
-      <Button
-        text="Submit"
-        type="button"
-        textSize="base"
-        onClick={handleSubmit}
-      />
+      <div className="flex justify-center w-full my-10 gap-5">
+        <Button
+          text="Discard and Capture New"
+          type="button"
+          textSize="base"
+          onClick={discardAndCaptureNew}
+        />
+        <Button
+          text="Slice"
+          type="button"
+          textSize="base"
+          onClick={handleSubmit}
+        />
+      </div>
     </div>
   );
 }
