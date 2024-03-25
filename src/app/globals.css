@@ -6,55 +6,14 @@ body {
   background-color: #1c1c1c;
 }
 
-.custom-border-input {
-  border: none;
-  border-bottom: 1px solid #333; /* Set bottom border */
-  outline: none; /* Remove default focus outline */
+.loader {
+  border-top-color: #ffffff;
+  border-left-color: #ffffff;
+  animation: spin 1.5s linear infinite;
 }
 
-.custom-border-input:focus {
-  border-bottom-color: #03a9f4; /* Change bottom border color on focus */
-  border-bottom-width: 2px;
-}
-
-.custom-width-400 {
-  width: 400px;
-}
-
-.custom-height-400 {
-  height: 400px;
-}
-
-.custom-width-90-percent {
-  width: 90%;
-}
-
-/* :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
 }
-
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-} */
