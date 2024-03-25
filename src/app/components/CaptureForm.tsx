@@ -85,9 +85,13 @@ const CaptureForm: React.FC<CaptureFormProps> = ({ title, forms }) => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col flex-grow border-1 rounded-md shadow-xl w-1/2 py-8 px-3 mb-3"
+      className="flex flex-col flex-grow w-1/2 py-8 px-3 mb-3"
     >
-      <h2 className="text-center text-3xl text-[#2298dc] mb-7">{title}</h2>
+      <div className="py-5 mb-7 border-b-[1px] border-t-[1px]">
+        <h2 className="text-center text-3xl text-white tranform-all hover:scale-105 duration-500 hover:text-[#2298dc] hover:cursor-pointer">
+          {title}
+        </h2>
+      </div>
       {forms.map((formData, index) => (
         <CaptureInput
           key={index}
