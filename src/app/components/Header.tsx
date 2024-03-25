@@ -11,7 +11,7 @@ export default function Header() {
   };
 
   return (
-    <div className="fixed top-0 text-4xl text-white flex relative w-full h-[100px] bg-transparent border-b-2 border-white justify-between items-center pl-[8rem] pr-[8rem] mb-4">
+    <div className="fixed top-0 text-4xl text-white flex relative w-full h-[100px] bg-transparent justify-between items-center pl-[8rem] pr-[8rem] mb-4">
       <a
         href="https://www.qoherent.ai"
         target="_blank"
