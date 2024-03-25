@@ -87,7 +87,7 @@ const CaptureForm: React.FC<CaptureFormProps> = ({ title, forms }) => {
       onSubmit={handleSubmit}
       className="flex flex-col flex-grow w-1/2 py-8 px-3 mb-3"
     >
-      <div className="py-5 mb-7 border-b-[1px] border-t-[1px]">
+      <div className="py-5 mb-7 border-b-[1px] border-t-[1px] border-[#625F63]">
         <h2 className="text-center text-3xl text-white tranform-all hover:scale-105 duration-500 hover:text-[#2298dc] hover:cursor-pointer">
           {title}
         </h2>
