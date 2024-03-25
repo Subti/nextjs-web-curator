@@ -47,18 +47,23 @@ export default function ReviewSetting({
   }, [formData]);
 
   return (
-    <div className="flex flex-col border-1 rounded-md shadow-xl custom-height-400 custom-width-400 py-8 px-3 mb-3">
-      <h2 className="text-center text-3xl text-[#2298dc] mb-7">{title}</h2>
+    <div className="flex flex-col bg-[#222] rounded-lg custom-height-400 custom-width-400 py-8 px-3 mb-3 mt-5">
+      <div className="border-t-[1px] border-b-[1px] border-t-[#625F63] border-b-[#625F63] mb-7 py-4">
+        <h2 className="text-center text-3xl text-white transition-all duration-500 hover:text-[#2298dc] hover:scale-105">
+          {title}
+        </h2>
+      </div>
       {formData && (
         <div>
           {Object.entries(data).map(([key, value]) => (
             <div key={key}>
-              <span className="font-bold">{key}:</span> {value as any}
+              <span className="font-bold text-white">{key}:</span>{" "}
+              <span className="text-white">{value as any}</span>
             </div>
           ))}
         </div>
       )}
-      {renderFormAndButton && (
+      {/* {renderFormAndButton && (
         <div className="flex flex-col justify-center items-center">
           <p>Enter the cut points as space seperated values</p>
           <br />
@@ -75,7 +80,7 @@ export default function ReviewSetting({
           </form>
           <Button type="submit" text="Save and Prune" />
         </div>
-      )}
+      )} */}
     </div>
   );
 }
