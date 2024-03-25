@@ -309,22 +309,13 @@ export default function Inspect(props: any) {
   return (
     <div className="flex flex-col items-center">
       <Header />
-      <div className="flex justify-between custom-width-90-percent mb-5">
-        <ReviewSettings
-          title="Recording Summary"
-          renderFormAndButton={false}
-          formData={recordingSummary}
-        />
+      <div className="flex justify-between w-[90%] mb-5">
+        <ReviewSettings title="Recording Summary" formData={recordingSummary} />
         <ReviewSettings
           title="SDR Capture Settings"
-          renderFormAndButton={false}
           formData={captureSettings}
         />
-        <ReviewSettings
-          title="Metadata"
-          renderFormAndButton={false}
-          formData={metaData}
-        />
+        <ReviewSettings title="Metadata" formData={metaData} />
       </div>
 
       <div
