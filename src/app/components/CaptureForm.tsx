@@ -15,14 +15,15 @@ interface FormData {
 interface CaptureFormProps {
   title: string;
   forms: FormData[];
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const CaptureForm: React.FC<CaptureFormProps> = ({ title, forms }) => {
+const CaptureForm: React.FC<CaptureFormProps> = ({
+  title,
+  forms,
+  setLoading
+}) => {
   const router = useRouter();
-  const [imageUrl, setImageUrl] = useState(null);
-  const [captureSettings, setCaptureSettings] = useState({});
-  const [recordingSummary, setRecordingSummary] = useState({});
-  const [metadata, setMetadata] = useState({});
   const [formValues, setFormValues] = useState<Record<string, string>>(
     forms.reduce((values, form) => ({ ...values, [form.id]: form.value }), {})
   );
@@ -64,6 +65,7 @@ const CaptureForm: React.FC<CaptureFormProps> = ({ title, forms }) => {
     }
 
     try {
+      setLoading(true);
       const response = await fetch("http://localhost:8000/", {
         method: "POST",
         body: formData
