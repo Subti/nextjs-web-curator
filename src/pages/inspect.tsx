@@ -12,9 +12,15 @@ interface Rectangle {
 
 interface InspectProps {
   setInspect: React.Dispatch<React.SetStateAction<boolean>>;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setLoadingText: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export default function Inspect({ setInspect }: InspectProps) {
+export default function Inspect({
+  setInspect,
+  setLoading,
+  setLoadingText
+}: InspectProps) {
   // const router = useRouter();
 
   // States from the original Inspect component
@@ -285,8 +291,15 @@ export default function Inspect({ setInspect }: InspectProps) {
     }
   };
 
+  const toggleWindow = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const discardAndCaptureNew = async () => {
     // router.push("/");
+    setLoadingText("Discarding Capture");
+    setLoading(true);
+    toggleWindow();
 
     const formData = new FormData();
     formData.append("action", "discard");
@@ -303,8 +316,10 @@ export default function Inspect({ setInspect }: InspectProps) {
       } else {
         const data = await response.text();
         if (data) {
-          setInspect(false);
-          console.log(data);
+          setTimeout(() => {
+            setInspect(false);
+            setLoading(false);
+          }, 2000);
         }
       }
     } catch (error) {
