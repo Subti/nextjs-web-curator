@@ -17,14 +17,19 @@ import Inspect from "@/pages/inspect";
 export default function Home() {
   const allForms = [...captureSettingsData, ...metadataData];
   const [loading, setLoading] = useState(false);
+  const [loadingText, setLoadingText] = useState("");
   const [inspect, setInspect] = useState(false);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen text-[#625F63]">
       {/* Conditional rendering of the Loading component */}
-      {loading && <Loading />}
+      {loading && <Loading text={loadingText} />}
       {inspect ? (
-        <Inspect setInspect={setInspect} />
+        <Inspect
+          setInspect={setInspect}
+          setLoadingText={setLoadingText}
+          setLoading={setLoading}
+        />
       ) : (
         <div className="flex flex-grow w-1/2">
           {/* Rendering Column component with all forms */}
@@ -32,6 +37,7 @@ export default function Home() {
             title="Capture Settings & Metadata"
             forms={allForms}
             setLoading={setLoading}
+            setLoadingText={setLoadingText}
             setInspect={setInspect}
           />
         </div>
