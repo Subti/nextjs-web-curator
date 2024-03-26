@@ -30,6 +30,10 @@ const CaptureForm: React.FC<CaptureFormProps> = ({
     forms.reduce((values, form) => ({ ...values, [form.id]: form.value }), {})
   );
 
+  const toggleWindow = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const handleFormChange = (id: string, value: string) => {
     setFormValues((values) => ({ ...values, [id]: value }));
   };
@@ -68,6 +72,7 @@ const CaptureForm: React.FC<CaptureFormProps> = ({
 
     try {
       setLoading(true);
+      toggleWindow();
       const response = await fetch("http://localhost:8000/", {
         method: "POST",
         body: formData
