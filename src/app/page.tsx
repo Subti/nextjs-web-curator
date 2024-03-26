@@ -5,6 +5,7 @@ import captureSettingsData from "./modules/captureSettingsData"; // Importing ca
 import metadataData from "./modules/metadataData"; // Importing metadataData module
 import CaptureForm from "./components/CaptureForm";
 import Loading from "./components/Loading";
+import Inspect from "@/pages/inspect";
 
 /**
  * Home Component
@@ -16,20 +17,25 @@ import Loading from "./components/Loading";
 export default function Home() {
   const allForms = [...captureSettingsData, ...metadataData];
   const [loading, setLoading] = useState(false);
+  const [inspect, setInspect] = useState(false);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen text-[#625F63]">
       {/* Conditional rendering of the Loading component */}
       {loading && <Loading />}
-
-      <div className="flex flex-grow w-1/2">
-        {/* Rendering Column component with all forms */}
-        <CaptureForm
-          title="Capture Settings & Metadata"
-          forms={allForms}
-          setLoading={setLoading}
-        />
-      </div>
+      {inspect ? (
+        <Inspect setInspect={setInspect} />
+      ) : (
+        <div className="flex flex-grow w-1/2">
+          {/* Rendering Column component with all forms */}
+          <CaptureForm
+            title="Capture Settings & Metadata"
+            forms={allForms}
+            setLoading={setLoading}
+            setInspect={setInspect}
+          />
+        </div>
+      )}
     </div>
   );
 }
