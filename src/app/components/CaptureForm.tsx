@@ -16,12 +16,14 @@ interface CaptureFormProps {
   title: string;
   forms: FormData[];
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setInspect: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const CaptureForm: React.FC<CaptureFormProps> = ({
   title,
   forms,
-  setLoading
+  setLoading,
+  setInspect
 }) => {
   const router = useRouter();
   const [formValues, setFormValues] = useState<Record<string, string>>(
@@ -76,7 +78,9 @@ const CaptureForm: React.FC<CaptureFormProps> = ({
       } else {
         const data = await response.json();
         if (data) {
-          router.push("/inspect");
+          // router.push("/inspect");
+          setLoading(false);
+          setInspect(true);
         }
       }
     } catch (error) {
