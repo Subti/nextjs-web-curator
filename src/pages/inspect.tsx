@@ -1,6 +1,5 @@
 import React, { useState, MouseEvent, useRef, useEffect } from "react";
 import { useRouter } from "next/router";
-import Header from "@/app/components/Header"; // Importing Header component
 import ReviewSettings from "@/app/components/ReviewSettings";
 import Button from "@/app/components/Button";
 
@@ -11,8 +10,12 @@ interface Rectangle {
   height: number;
 }
 
-export default function Inspect(props: any) {
-  const router = useRouter();
+interface InspectProps {
+  setInspect: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export default function Inspect({ setInspect }: InspectProps) {
+  // const router = useRouter();
 
   // States from the original Inspect component
   const [protocol, setProtocol] = useState("");
@@ -271,7 +274,7 @@ export default function Inspect(props: any) {
       const data = await response.json();
       console.log(data);
 
-      router.push("/sliced-images");
+      // router.push("/sliced-images");
 
       // Redirect to the sliced-images page only after the fetch request is successfully completed
     } catch (error) {
@@ -283,7 +286,7 @@ export default function Inspect(props: any) {
   };
 
   const discardAndCaptureNew = async () => {
-    router.push("/");
+    // router.push("/");
 
     const formData = new FormData();
     formData.append("action", "discard");
@@ -299,7 +302,10 @@ export default function Inspect(props: any) {
         console.error("HTTP error", response.status);
       } else {
         const data = await response.text();
-        console.log(data);
+        if (data) {
+          setInspect(false);
+          console.log(data);
+        }
       }
     } catch (error) {
       console.error("Error:", error);
@@ -307,8 +313,7 @@ export default function Inspect(props: any) {
   };
 
   return (
-    <div className="flex flex-col items-center">
-      <Header />
+    <>
       <div className="flex justify-between w-[90%] mb-5">
         <ReviewSettings title="Recording Summary" formData={recordingSummary} />
         <ReviewSettings
@@ -430,16 +435,16 @@ export default function Inspect(props: any) {
         <Button
           text="Discard and Capture New"
           type="button"
-          textSize="base"
+          textSize="xl"
           onClick={discardAndCaptureNew}
         />
         <Button
           text="Slice"
           type="button"
-          textSize="base"
+          textSize="xl"
           onClick={handleSubmit}
         />
       </div>
-    </div>
+    </>
   );
 }
