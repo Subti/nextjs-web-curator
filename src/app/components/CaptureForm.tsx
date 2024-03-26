@@ -16,6 +16,7 @@ interface CaptureFormProps {
   title: string;
   forms: FormData[];
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setLoadingText: React.Dispatch<React.SetStateAction<string>>;
   setInspect: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -23,6 +24,7 @@ const CaptureForm: React.FC<CaptureFormProps> = ({
   title,
   forms,
   setLoading,
+  setLoadingText,
   setInspect
 }) => {
   const router = useRouter();
@@ -71,6 +73,7 @@ const CaptureForm: React.FC<CaptureFormProps> = ({
     }
 
     try {
+      setLoadingText("Generating Signal");
       setLoading(true);
       toggleWindow();
       const response = await fetch("http://localhost:8000/", {
