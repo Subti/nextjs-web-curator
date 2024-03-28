@@ -24,7 +24,7 @@ export default function Header() {
         {NavLinks.map((item) => (
           <p
             key={item.id}
-            className={`text-base mr-10 cursor-pointer transition-all duration-500 hover:text-[#03A9F4] hover:scale-110`}
+            className={`text-base mr-10 cursor-pointer transition-all duration-500 hover:text-qoherentblue hover:scale-110`}
           >
             {item.id}
           </p>

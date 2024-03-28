@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import captureSettingsData from "./modules/captureSettingsData"; // Importing captureSettingsData module
-import metadataData from "./modules/metadataData"; // Importing metadataData module
+import captureSettingsData from "./modules/captureSettingsData";
+import metadataData from "./modules/metadataData";
 import CaptureForm from "./components/CaptureForm";
 import Loading from "./components/Loading";
 import Inspect from "@/pages/inspect";
@@ -11,8 +11,6 @@ import Inspect from "@/pages/inspect";
  * Home Component
  *
  * This component represents the home page of the application.
- * It includes a header, two columns (Capture Settings and Metadata),
- * and a button.
  */
 export default function Home() {
   const allForms = [...captureSettingsData, ...metadataData];
@@ -21,7 +19,7 @@ export default function Home() {
   const [inspect, setInspect] = useState(false);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen text-[#625F63]">
+    <div className="flex flex-col items-center justify-center min-h-screen text-qoherentlightgray">
       {/* Conditional rendering of the Loading component */}
       {loading && <Loading text={loadingText} />}
       {inspect ? (

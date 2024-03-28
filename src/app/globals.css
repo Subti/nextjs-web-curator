@@ -7,10 +7,6 @@ body {
 }
 
 .loader {
-  border-top-color: #03a9f4;
-  border-bottom-color: #884da0;
-  border-left-color: transparent;
-  border-right-color: transparent;
   animation: spin 1.5s linear infinite;
 }
 

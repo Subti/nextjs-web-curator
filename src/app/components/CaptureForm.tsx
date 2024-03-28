@@ -73,7 +73,7 @@ const CaptureForm: React.FC<CaptureFormProps> = ({
     }
 
     try {
-      setLoadingText("Generating Signal");
+      setLoadingText("Capturing Signal");
       setLoading(true);
       toggleWindow();
       const response = await fetch("http://localhost:8000/", {
@@ -101,8 +101,8 @@ const CaptureForm: React.FC<CaptureFormProps> = ({
       onSubmit={handleSubmit}
       className="flex flex-col flex-grow w-1/2 py-8 px-3 mb-3"
     >
-      <div className="py-5 mb-7 border-b-[1px] border-t-[1px] border-[#625F63]">
-        <h2 className="text-center text-3xl text-white tranform-all hover:scale-105 duration-500 hover:text-[#2298dc] hover:cursor-pointer">
+      <div className="py-5 mb-7 border-b-[1px] border-t-[1px] border-qoherentlightgray">
+        <h2 className="text-center text-3xl text-white tranform-all hover:scale-105 duration-500 hover:text-qoherentblue hover:cursor-pointer">
           {title}
         </h2>
       </div>

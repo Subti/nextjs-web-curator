@@ -36,8 +36,8 @@ export default function ReviewSetting({ title, formData }: ReviewSettingProps) {
   }, [formData]);
 
   return (
-    <div className="flex flex-col bg-[#222] rounded-lg h-[400px] w-[400px] py-8 px-3 mb-3 mt-5">
-      <div className="border-t-[1px] border-b-[1px] border-t-[#625F63] border-b-[#625F63] mb-7 py-4">
+    <div className="flex flex-col bg-qoherentgray rounded-lg h-[400px] w-[400px] py-8 px-3 mb-3 mt-5">
+      <div className="border-t-[1px] border-b-[1px] border-t-qoherentlightgray border-b-qoherentlightgray mb-7 py-4">
         <h2 className="text-center text-3xl text-white transition-all duration-500 hover:text-[#2298dc] hover:scale-105 hover:cursor-pointer">
           {title}
         </h2>
