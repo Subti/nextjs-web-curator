@@ -11,15 +11,19 @@ interface Rectangle {
 }
 
 interface InspectProps {
-  setInspect: React.Dispatch<React.SetStateAction<boolean>>;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setLoadingText: React.Dispatch<React.SetStateAction<string>>;
+  setCapture: React.Dispatch<React.SetStateAction<boolean>>;
+  setInspect: React.Dispatch<React.SetStateAction<boolean>>;
+  setSliced: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export default function Inspect({
+  setCapture,
   setInspect,
   setLoading,
-  setLoadingText
+  setLoadingText,
+  setSliced
 }: InspectProps) {
   // const router = useRouter();
 
@@ -267,6 +271,9 @@ export default function Inspect({
     formData.append("sample_rate", sampleRate.toString());
 
     try {
+      setLoadingText("Slicing Capture");
+      setLoading(true);
+      toggleWindow();
       const response = await fetch("http://localhost:8000/result", {
         method: "POST",
         body: formData
@@ -279,6 +286,13 @@ export default function Inspect({
       // Optionally, process response data here
       const data = await response.json();
       console.log(data);
+      if (data) {
+        setTimeout(() => {
+          setInspect(false);
+          setLoading(false);
+          setSliced(true);
+        }, 2000);
+      }
 
       // router.push("/sliced-images");
 
@@ -319,6 +333,7 @@ export default function Inspect({
           setTimeout(() => {
             setInspect(false);
             setLoading(false);
+            setCapture(true);
           }, 2000);
         }
       }

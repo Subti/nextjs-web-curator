@@ -15,9 +15,10 @@ interface FormData {
 interface CaptureFormProps {
   title: string;
   forms: FormData[];
+  setCapture: React.Dispatch<React.SetStateAction<boolean>>;
+  setInspect: React.Dispatch<React.SetStateAction<boolean>>;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setLoadingText: React.Dispatch<React.SetStateAction<string>>;
-  setInspect: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const CaptureForm: React.FC<CaptureFormProps> = ({
@@ -25,6 +26,7 @@ const CaptureForm: React.FC<CaptureFormProps> = ({
   forms,
   setLoading,
   setLoadingText,
+  setCapture,
   setInspect
 }) => {
   const router = useRouter();
@@ -88,6 +90,7 @@ const CaptureForm: React.FC<CaptureFormProps> = ({
         if (data) {
           // router.push("/inspect");
           setLoading(false);
+          setCapture(false);
           setInspect(true);
         }
       }
@@ -97,24 +100,26 @@ const CaptureForm: React.FC<CaptureFormProps> = ({
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="flex flex-col flex-grow w-1/2 py-8 px-3 mb-3"
-    >
-      <div className="py-5 mb-7 border-b-[1px] border-t-[1px] border-qoherentlightgray">
-        <h2 className="text-center text-3xl text-white tranform-all hover:scale-105 duration-500 hover:text-qoherentblue hover:cursor-pointer">
-          {title}
-        </h2>
-      </div>
-      {forms.map((formData, index) => (
-        <CaptureInput
-          key={index}
-          {...formData}
-          onChange={(value: string) => handleFormChange(formData.id, value)}
-        />
-      ))}
-      <Button text="Submit" type="submit" textSize="xl" />
-    </form>
+    <div className="flex flex-grow w-1/2">
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col flex-grow w-1/2 py-8 px-3 mb-3"
+      >
+        <div className="py-5 mb-7 border-b-[1px] border-t-[1px] border-qoherentlightgray">
+          <h2 className="text-center text-3xl text-white tranform-all hover:scale-105 duration-500 hover:text-qoherentblue hover:cursor-pointer">
+            {title}
+          </h2>
+        </div>
+        {forms.map((formData, index) => (
+          <CaptureInput
+            key={index}
+            {...formData}
+            onChange={(value: string) => handleFormChange(formData.id, value)}
+          />
+        ))}
+        <Button text="Submit" type="submit" textSize="xl" />
+      </form>
+    </div>
   );
 };
 
