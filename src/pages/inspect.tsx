@@ -18,6 +18,7 @@ interface InspectProps {
   setSliced: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+// Function component for handling image inspection
 export default function Inspect({
   setCapture,
   setInspect,
@@ -25,8 +26,6 @@ export default function Inspect({
   setLoadingText,
   setSliced
 }: InspectProps) {
-  // const router = useRouter();
-
   // States from the original Inspect component
   const [protocol, setProtocol] = useState("");
   const [numSamples, setNumSamples] = useState(0);
@@ -71,6 +70,7 @@ export default function Inspect({
       .catch((error) => console.error("Error:", error));
   }, []);
 
+  // Effect to update currentDivBounds when imageRef.current changes
   useEffect(() => {
     if (imageRef.current) {
       const mainDiv = document.getElementById("mainDiv");
@@ -78,6 +78,7 @@ export default function Inspect({
     }
   }, [imageRef.current]);
 
+  // Function to handle image load event
   const handleImageLoad = () => {
     if (imageRef.current) {
       const mainDiv = document.getElementById("mainDiv");
@@ -85,6 +86,7 @@ export default function Inspect({
     }
   };
 
+  // Function to handle mouse down event for drawing rectangles
   const handleMouseDown = (e: MouseEvent) => {
     if (selectedRectangleIndex !== null) return; // Prevent drawing new boxes when a box is selected
     const mainDiv = document.getElementById("mainDiv");
@@ -124,6 +126,7 @@ export default function Inspect({
     }
   };
 
+  // Function to handle mouse move event for updating rectangle while drawing
   const handleMouseMove = (e: MouseEvent) => {
     if (!currentRect || !startPoint) return;
     const mainDiv = document.getElementById("mainDiv");
@@ -162,6 +165,7 @@ export default function Inspect({
     });
   };
 
+  // Function to handle mouse up event for finalizing rectangle drawing
   const handleMouseUp = () => {
     if (!currentRect || !currentDivBounds) return;
 
@@ -199,11 +203,13 @@ export default function Inspect({
     console.log(newCutPoints);
   };
 
+  // Function to handle deletion of a rectangle
   const handleDelete = (i: number) => {
     setRectangles((rects) => rects.filter((_, index) => index !== i));
     setSelectedRectangleIndex(null);
   };
 
+  // Function to convert rectangles to cut points
   const convertToCutPoints = (
     rectangles: Rectangle[],
     imageWidth: number,
@@ -226,6 +232,7 @@ export default function Inspect({
     });
   };
 
+  // Function to calculate cut point position
   const calculateCutPointPosition = (
     rectangle: Rectangle,
     cutPoint: string,
@@ -244,6 +251,7 @@ export default function Inspect({
     return { start: startPosition, end: endPosition };
   };
 
+  // Function to handle form submission for slicing
   const handleSubmit = async () => {
     if (!currentDivBounds) return;
 
@@ -305,10 +313,12 @@ export default function Inspect({
     }
   };
 
+  // Function to toggle window scrolling to top
   const toggleWindow = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  // Function to discard capture and start new capture
   const discardAndCaptureNew = async () => {
     // router.push("/");
     setLoadingText("Discarding Capture");
@@ -342,6 +352,7 @@ export default function Inspect({
     }
   };
 
+  // Return JSX for the component
   return (
     <>
       <div className="flex justify-between w-[90%] mb-5">

@@ -7,13 +7,17 @@ interface ReviewSettingProps {
   formData: Record<string, any> | null;
 }
 
+// Function component for displaying review settings
 export default function ReviewSetting({ title, formData }: ReviewSettingProps) {
+  // State hook for storing transformed data
   const [data, setData] = useState({});
 
+  // Function to transform keys of an object to capitalize each word
   function transformKeys(obj: { [key: string]: any }): { [key: string]: any } {
     const transformedObj: { [key: string]: any } = {};
     for (let key in obj) {
       if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        // Capitalize each word in the key
         const newKey = key
           .split("_")
           .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
@@ -24,17 +28,22 @@ export default function ReviewSetting({ title, formData }: ReviewSettingProps) {
     return transformedObj;
   }
 
+  // Effect hook to update data when formData changes
   useEffect(() => {
     if (formData) {
+      // Set a timeout to update data after a delay
       const timeout = setTimeout(() => {
+        // Transform keys of formData and update data
         setData(transformKeys(formData));
         console.log("Setting Displayed");
       }, 100);
 
+      // Clear the timeout on component unmount or when formData changes
       return () => clearTimeout(timeout);
     }
   }, [formData]);
 
+  // Return JSX for the component
   return (
     <div className="flex flex-col bg-qoherentgray rounded-lg h-[400px] w-[400px] py-8 px-3 mb-3 mt-5">
       <div className="border-t-[1px] border-b-[1px] border-t-qoherentlightgray border-b-qoherentlightgray mb-7 py-4">

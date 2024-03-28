@@ -30,21 +30,27 @@ const CaptureForm: React.FC<CaptureFormProps> = ({
   setInspect
 }) => {
   const router = useRouter();
+
+  // State to hold form values
   const [formValues, setFormValues] = useState<Record<string, string>>(
     forms.reduce((values, form) => ({ ...values, [form.id]: form.value }), {})
   );
 
+  // Function to toggle window scrolling to top
   const toggleWindow = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  // Function to handle form input change
   const handleFormChange = (id: string, value: string) => {
     setFormValues((values) => ({ ...values, [id]: value }));
   };
 
+  // Function to handle form submission
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
+    // Process form values
     const processedFormValues: { [key: string]: string | number } = {
       ...formValues
     };
@@ -64,20 +70,26 @@ const CaptureForm: React.FC<CaptureFormProps> = ({
       processedFormValues.channel = parseInt(formValues.channel);
     }
 
+    // Create FormData object
     const formData = new FormData();
 
+    // Append form data to FormData object
     for (const key in processedFormValues) {
       formData.append(key, processedFormValues[key].toString());
     }
 
+    // Log FormData entries
     for (let pair of formData.entries()) {
       console.log(pair[0] + ", " + pair[1]);
     }
 
     try {
+      // Set loading state and toggle window scroll
       setLoadingText("Capturing Signal");
       setLoading(true);
       toggleWindow();
+
+      // Send POST request to server
       const response = await fetch("http://localhost:8000/", {
         method: "POST",
         body: formData
@@ -99,6 +111,7 @@ const CaptureForm: React.FC<CaptureFormProps> = ({
     }
   };
 
+  // JSX for the component
   return (
     <div className="flex flex-grow w-1/2">
       <form
