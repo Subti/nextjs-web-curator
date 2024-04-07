@@ -29,9 +29,9 @@ const DatasetPage = () => {
 
   return (
     <div className="container mx-auto px-10 py-8">
-      <h1 className="text-4xl text-center font-bold mb-8">Results of Dataset Curation:</h1>
+      <h1 className="text-4xl text-center font-bold mb-8 text-white">Results of Dataset Curation:</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-white">
 
         <span className="flex-1">
           <h2 className="text-2xl mb-4 font-bold">Number of examples per unique pair</h2>
@@ -103,7 +103,7 @@ const DatasetPage = () => {
       <div className="flex mt-10 mb-20">
 
 
-        <div className="flex-1 mr-4">
+        <div className="flex-1 mr-4 text-white">
           <h2 className="text-2xl mb-4 font-bold">Dataset Statistics</h2>
           <table className="table-auto">
             <tbody>
@@ -150,26 +150,26 @@ const DatasetPage = () => {
         </div>
 
         <div className="flex-1 mr-4">
-          <h2 className="text-2xl mb-4 font-bold">Dataset configuration:</h2>
+          <h2 className="text-2xl mb-4 font-bold text-white">Dataset configuration:</h2>
           <form onSubmit={handleSubmit} className="flex flex-col items-center justify-center">
-            <label htmlFor="homogenize" className="font-bold">Subsample examples to a fixed maximum:</label>
+            <label htmlFor="homogenize" className="font-bold text-white">Subsample examples to a fixed maximum:</label>
             <input
               type="text"
               id="homogenize"
               name="homogenize"
               className="border border-gray-300 rounded-md p-2 w-full mb-4"
             />
-            <label htmlFor="augment" className="font-bold">Fill gaps with augmentations:</label>
+            <label htmlFor="augment" className="font-bold text-white">Fill gaps with augmentations:</label>
             <input
               type="text"
               id="augment"
               name="augment"
               className="border border-gray-300 rounded-md p-2 w-full mb-4"
             />
-            <label className="font-bold">Drop Classes:</label>
+            <label className="font-bold text-white">Drop Classes:</label>
             {/* Checkboxes for dropping classes */}
             <div>
-              <label htmlFor="drop_wifi_ambient" className="cursor-pointer hover:text-blue-600 transition duration-300">
+              <label htmlFor="drop_wifi_ambient" className="text-white cursor-pointer hover:text-blue-100 transition duration-300">
                 <input type="checkbox" id="drop_wifi_ambient" name="drop_classes" value="wifi_ambient" className="mr-2" />
                 Wifi-BGN, ambient
               </label>
