@@ -48,11 +48,11 @@ const CuratePage = () => {
   return (
     <div className="container mx-auto px-10 py-8">
       <div className="bg-blue-200 text-center py-2 rounded-md mb-8">
-        <h1 className="text-4xl text-center font-bold mb-8">Dataset Curation</h1>
+        <h1 className="text-4xl text-center font-bold mb-8 text-white">Dataset Curation</h1>
       </div>
       <form onSubmit={handleSubmit} className="flex flex-col items-center justify-center">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div>
+          <div className="text-white">
             <h2 className="text-2xl mb-4 font-bold">Recording summary</h2>
             {/* Display recording summary data */}
             <table className="table-auto">
@@ -68,8 +68,8 @@ const CuratePage = () => {
             {/* End of recording summary data */}
           </div>
           <div>
-            <h2 className="text-2xl mb-4 font-bold">Dataset Configuration:</h2>
-            <label htmlFor="example_length">Example Length:</label>
+            <h2 className="text-2xl mb-4 font-bold text-white">Dataset Configuration:</h2>
+            <label htmlFor="example_length" className="text-white">Example Length:</label>
             <input
               type="text"
               id="example_length"
@@ -78,7 +78,7 @@ const CuratePage = () => {
               onChange={(e) => setFormData({ ...formData, example_length: e.target.value })}
               className="border border-gray-300 rounded-md p-2 w-full mb-4"
             />
-            <label htmlFor="class_1">Primary Label:</label>
+            <label htmlFor="class_1" className="text-white">Primary Label:</label>
             <input
               type="text"
               id="class_1"
@@ -87,7 +87,7 @@ const CuratePage = () => {
               onChange={(e) => setFormData({ ...formData, class_1: e.target.value })}
               className="border border-gray-300 rounded-md p-2 w-full mb-4"
             />
-            <label htmlFor="class_2">Second Label:</label>
+            <label htmlFor="class_2" className="text-white">Second Label:</label>
             <input
               type="text"
               id="class_2"
@@ -96,7 +96,7 @@ const CuratePage = () => {
               onChange={(e) => setFormData({ ...formData, class_2: e.target.value })}
               className="border border-gray-300 rounded-md p-2 w-full mb-4"
             />
-            <label htmlFor="dataset_name">Filename:</label>
+            <label htmlFor="dataset_name" className="text-white">Filename:</label>
             <input
               type="text"
               id="dataset_name"
