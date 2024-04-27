@@ -1,5 +1,6 @@
 /* eslint-disable react/no-unescaped-entities */
 import React, { useState } from 'react';
+import Button from "@/app/components/Button";
 import 'tailwindcss/tailwind.css';
 
 const DatasetPage = () => {
@@ -174,8 +175,22 @@ const DatasetPage = () => {
                 Wifi-BGN, ambient
               </label>
             </div>
-            <input onClick={handlePrepareFinal} type="submit" value="Prepare Final" className="bg-blue-500 text-white px-6 py-3 rounded-full mt-8 cursor-pointer hover:bg-blue-600 hover:pointer transition duration-300" />
-            <button onClick={handleDownloadDraft} className="bg-blue-500 text-white px-6 py-3 rounded-full mt-8 cursor-pointer hover:bg-blue-600 hover:pointer transition duration-300">Download Draft</button>
+            {/* <input onClick={handlePrepareFinal} type="submit" value="Prepare Final" className="bg-blue-500 text-white px-6 py-3 rounded-full mt-8 cursor-pointer hover:bg-blue-600 hover:pointer transition duration-300" />
+            <button onClick={handleDownloadDraft} className="bg-blue-500 text-white px-6 py-3 rounded-full mt-8 cursor-pointer hover:bg-blue-600 hover:pointer transition duration-300">Download Draft</button> */}
+            <div className="flex justify-center w-full my-10 gap-5">
+              <Button
+                text="Prepare Final"
+                type="button"
+                textSize="xl"
+                onClick={handlePrepareFinal}
+              />
+              <Button
+                text="Download Draft"
+                type="button"
+                textSize="xl"
+                onClick={handleDownloadDraft}
+              />
+            </div>
           </form>
         </div>
 
@@ -186,9 +201,15 @@ const DatasetPage = () => {
       </div>
       <div className="flex justify-center mt-8">
         <form onSubmit={handleSubmit}>
-          <button onClick={handleClearAllAndReset} type="submit" className="bg-blue-500 text-white px-6 py-3 rounded-full cursor-pointer hover:bg-blue-600 transition duration-300">
+          {/* <button onClick={handleClearAllAndReset} type="submit" className="bg-blue-500 text-white px-6 py-3 rounded-full cursor-pointer hover:bg-blue-600 transition duration-300">
             Clear all and reset
-          </button>
+          </button> */}
+          <Button
+            text="Clear all and reset"
+            type="button"
+            textSize="xl"
+            onClick={handleClearAllAndReset}
+          />
         </form>
       </div>
 

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Button from "@/app/components/Button";
 import 'tailwindcss/tailwind.css';
 
 const CuratePage = () => {
@@ -107,8 +108,22 @@ const CuratePage = () => {
             />
           </div>
         </div>
-        <input onClick={handlePrepareDraftDataset} type="submit" value="Prepare draft dataset" className="bg-blue-500 text-white px-6 py-3 rounded-full mt-8 mb-10 cursor-pointer hover:bg-blue-600 transition duration-300" />
-        <input onClick={handleClearAllAndReset} type="submit" value="Clear all and reset" className="bg-blue-500 text-white px-6 py-3 rounded-full mt-8 cursor-pointer hover:bg-blue-600 transition duration-300" />
+        {/* <input onClick={handlePrepareDraftDataset} type="submit" value="Prepare draft dataset" className="bg-blue-500 text-white px-6 py-3 rounded-full mt-8 mb-10 cursor-pointer hover:bg-blue-600 transition duration-300" />
+        <input onClick={handleClearAllAndReset} type="submit" value="Clear all and reset" className="bg-blue-500 text-white px-6 py-3 rounded-full mt-8 cursor-pointer hover:bg-blue-600 transition duration-300" /> */}
+        <div className="flex justify-center w-full my-10 gap-5">
+          <Button
+            text="Prepare draft dataset"
+            type="button"
+            textSize="xl"
+            onClick={handlePrepareDraftDataset}
+          />
+          <Button
+            text="Clear all and reset"
+            type="button"
+            textSize="xl"
+            onClick={handleClearAllAndReset}
+          />
+        </div>
       </form>
     </div>
   );
