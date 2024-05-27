@@ -6,4 +6,4 @@ Use `npm run dev` to start development server, `python3 main.py` to start the ba
 
 ## Final Product
 
-!["Demo of how app works"](https://github.com/adam-kowalczuk/nextjs-web-curator/blob/main/docs/test.png?raw=true)
+!["Demo of how app works"](https://github.com/Subti/nextjs-web-curator/blob/main/docs/test.PNG?raw=true)
