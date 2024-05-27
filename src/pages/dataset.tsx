@@ -7,6 +7,7 @@ const DatasetPage = () => {
   const [terminalOutput, setTerminalOutput] = useState('');
 
   // Draft dataset, pre-filtered
+  /* This data should have been passed from /curate route to here, for further filtering later */
   const draftDataset = {
     pairs: [
       { key: "('Wifi-BGN', 'ambient')", num_examples: 7 }

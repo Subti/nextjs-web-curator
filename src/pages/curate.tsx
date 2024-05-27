@@ -11,6 +11,7 @@ const CuratePage = () => {
   });
 
   // Sample recording summary data
+  /* Get data from previous step in curator */
   const recordingSummaryData = {
     protocol: "Wifi-BGN",
     use_case: "ambient",
@@ -42,6 +43,7 @@ const CuratePage = () => {
 
   const handlePrepareDraftDataset = () => {
     // Display alert when "Prepare Draft Dataset" is clicked for testing only
+    /* This should either redirect or refresh page with relevant /dataset route info */
     alert("Prepare Draft Dataset clicked!");
 
   };
